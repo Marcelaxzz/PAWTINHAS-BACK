@@ -10,3 +10,15 @@ C:\Users\Murilo\Desktop\pawtinhas\src\Pawtinhas.Domain\obj\Debug\net10.0\Pawtinh
 C:\Users\Murilo\Desktop\pawtinhas\src\Pawtinhas.Domain\obj\Debug\net10.0\refint\Pawtinhas.Domain.dll
 C:\Users\Murilo\Desktop\pawtinhas\src\Pawtinhas.Domain\obj\Debug\net10.0\Pawtinhas.Domain.pdb
 C:\Users\Murilo\Desktop\pawtinhas\src\Pawtinhas.Domain\obj\Debug\net10.0\ref\Pawtinhas.Domain.dll
+C:\Users\Murilo\Documents\PAWTINHAS-BACK\src\Pawtinhas.Domain\bin\Debug\net10.0\Pawtinhas.Domain.deps.json
+C:\Users\Murilo\Documents\PAWTINHAS-BACK\src\Pawtinhas.Domain\bin\Debug\net10.0\Pawtinhas.Domain.dll
+C:\Users\Murilo\Documents\PAWTINHAS-BACK\src\Pawtinhas.Domain\bin\Debug\net10.0\Pawtinhas.Domain.pdb
+C:\Users\Murilo\Documents\PAWTINHAS-BACK\src\Pawtinhas.Domain\obj\Debug\net10.0\Pawtinhas.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Murilo\Documents\PAWTINHAS-BACK\src\Pawtinhas.Domain\obj\Debug\net10.0\Pawtinhas.Domain.AssemblyInfoInputs.cache
+C:\Users\Murilo\Documents\PAWTINHAS-BACK\src\Pawtinhas.Domain\obj\Debug\net10.0\Pawtinhas.Domain.AssemblyInfo.cs
+C:\Users\Murilo\Documents\PAWTINHAS-BACK\src\Pawtinhas.Domain\obj\Debug\net10.0\Pawtinhas.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Murilo\Documents\PAWTINHAS-BACK\src\Pawtinhas.Domain\obj\Debug\net10.0\Pawtinhas.Domain.sourcelink.json
+C:\Users\Murilo\Documents\PAWTINHAS-BACK\src\Pawtinhas.Domain\obj\Debug\net10.0\Pawtinhas.Domain.dll
+C:\Users\Murilo\Documents\PAWTINHAS-BACK\src\Pawtinhas.Domain\obj\Debug\net10.0\refint\Pawtinhas.Domain.dll
+C:\Users\Murilo\Documents\PAWTINHAS-BACK\src\Pawtinhas.Domain\obj\Debug\net10.0\Pawtinhas.Domain.pdb
+C:\Users\Murilo\Documents\PAWTINHAS-BACK\src\Pawtinhas.Domain\obj\Debug\net10.0\ref\Pawtinhas.Domain.dll

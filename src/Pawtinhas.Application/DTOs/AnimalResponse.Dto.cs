@@ -1,3 +1,4 @@
+
 using Pawtinhas.Domain;
 using Pawtinhas.Domain.Enums;
 
@@ -18,6 +19,10 @@ public class AnimalResponseDto
     public string? Observacoes { get; set; }
     public DateTime CriadoEm { get; set; }
 
+    public string? FotoUrl { get; set; }
+    public string? Localizacao { get; set; }
+    public PersonalidadeAnimal? Personalidade { get; set; }
+
     public static AnimalResponseDto FromEntity(Animal animal)
     {
         return new AnimalResponseDto
@@ -33,7 +38,10 @@ public class AnimalResponseDto
             Porte = animal.Porte,
             PesoKg = animal.PesoKg,
             Observacoes = animal.Observacoes,
-            CriadoEm = animal.CriadoEm
+            CriadoEm = animal.CriadoEm,
+            FotoUrl = animal.FotoUrl,
+            Localizacao = animal.Localizacao,
+            Personalidade = animal.Personalidade
         };
     }
 }

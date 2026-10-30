@@ -2525,11 +2525,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Murilo\\Desktop\\pawtinhas\\src\\Pawtinhas.API\\Pawtinhas.API.csproj",
+      "projectUniqueName": "C:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.API\\Pawtinhas.API.csproj",
       "projectName": "Pawtinhas.API",
-      "projectPath": "C:\\Users\\Murilo\\Desktop\\pawtinhas\\src\\Pawtinhas.API\\Pawtinhas.API.csproj",
+      "projectPath": "C:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.API\\Pawtinhas.API.csproj",
       "packagesPath": "C:\\Users\\Murilo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Murilo\\Desktop\\pawtinhas\\src\\Pawtinhas.API\\obj\\",
+      "outputPath": "C:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Murilo\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -2545,11 +2545,11 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Users\\Murilo\\Desktop\\pawtinhas\\src\\Pawtinhas.Application\\Pawtinhas.Application.csproj": {
-              "projectPath": "C:\\Users\\Murilo\\Desktop\\pawtinhas\\src\\Pawtinhas.Application\\Pawtinhas.Application.csproj"
+            "C:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Application\\Pawtinhas.Application.csproj": {
+              "projectPath": "C:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Application\\Pawtinhas.Application.csproj"
             },
-            "C:\\Users\\Murilo\\Desktop\\pawtinhas\\src\\Pawtinhas.Infrastructure\\Pawtinhas.Infrastructure.csproj": {
-              "projectPath": "C:\\Users\\Murilo\\Desktop\\pawtinhas\\src\\Pawtinhas.Infrastructure\\Pawtinhas.Infrastructure.csproj"
+            "C:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Infrastructure\\Pawtinhas.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Infrastructure\\Pawtinhas.Infrastructure.csproj"
             }
           }
         }
@@ -3022,5 +3022,17 @@
         }
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'MySqlConnector' 2.4.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-473q-m89c-ghf8",
+      "libraryId": "MySqlConnector",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

@@ -20,4 +20,9 @@ public class CadastrarAnimalDto
     public PorteAnimal? Porte { get; set; }
     public decimal? PesoKg { get; set; }
     public string? Observacoes { get; set; }
+    public string? FotoUrl { get; set; }
+
+    public string? Localizacao { get; set; }
+
+    public PersonalidadeAnimal? Personalidade { get; set; }
 }

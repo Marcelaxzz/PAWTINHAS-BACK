@@ -39,7 +39,10 @@ public class AnimalAppService
             dto.DataNascimento,
             dto.Porte,
             dto.PesoKg,
-            dto.Observacoes);
+            dto.Observacoes,
+            dto.FotoUrl,
+            dto.Localizacao,
+            dto.Personalidade);
 
         await _repository.AdicionarAsync(animal);
         await _unitOfWork.CommitAsync();
@@ -89,7 +92,10 @@ public class AnimalAppService
             dto.DataNascimento,
             dto.Porte,
             dto.PesoKg,
-            dto.Observacoes);
+            dto.Observacoes,
+            dto.FotoUrl,
+            dto.Localizacao,
+            dto.Personalidade);
 
         _repository.Atualizar(animal);
         await _unitOfWork.CommitAsync();

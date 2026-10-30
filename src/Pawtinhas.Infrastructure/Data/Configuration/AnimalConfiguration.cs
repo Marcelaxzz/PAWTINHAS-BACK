@@ -20,6 +20,11 @@ public class AnimalConfiguration : IEntityTypeConfiguration<Animal>
         builder.Property(a => a.Sexo)
             .IsRequired()
             .HasMaxLength(30);
+        builder.Property(a => a.FotoUrl)
+            .HasMaxLength(500);
+
+        builder.Property(a => a.Localizacao)
+            .HasMaxLength(200);
 
         builder.HasOne(a => a.Responsavel)
             .WithMany(r => r.Animais)

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Pawtinhas.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8ebbbc94980ce1ac784176197ece76512ddf4f8f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+66721e98ac043b1efc060bf3dc4d77d92bc3337f")]
 [assembly: System.Reflection.AssemblyProductAttribute("Pawtinhas.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Pawtinhas.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

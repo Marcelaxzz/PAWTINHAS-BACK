@@ -6,6 +6,7 @@ namespace Pawtinhas.Domain;
 public class Animal
 {
     public int Id { get; private set; }
+
     public int ResponsavelId { get; private set; }
     public Responsavel Responsavel { get; private set; } = null!;
 
@@ -20,6 +21,10 @@ public class Animal
     public string? Observacoes { get; private set; }
     public DateTime CriadoEm { get; private set; } = DateTime.UtcNow;
 
+    public string? FotoUrl { get; private set; }
+    public string? Localizacao { get; private set; }
+    public PersonalidadeAnimal? Personalidade { get; private set; }
+
     private Animal() { }
 
     public Animal(
@@ -31,7 +36,10 @@ public class Animal
         DateTime? dataNascimento = null,
         PorteAnimal? porte = null,
         decimal? pesoKg = null,
-        string? observacoes = null)
+        string? observacoes = null,
+        string? fotoUrl = null,
+        string? localizacao = null,
+        PersonalidadeAnimal? personalidade = null)
     {
         ResponsavelId = responsavelId;
         Nome = nome;
@@ -43,6 +51,9 @@ public class Animal
         PesoKg = pesoKg;
         Observacoes = observacoes;
         Status = SituacaoAnimal.ATIVO;
+        FotoUrl = fotoUrl;
+        Localizacao = localizacao;
+        Personalidade = personalidade;
     }
 
     public void AtualizarDados(
@@ -54,7 +65,10 @@ public class Animal
         DateTime? dataNascimento,
         PorteAnimal? porte,
         decimal? pesoKg,
-        string? observacoes)
+        string? observacoes,
+        string? fotoUrl,
+        string? localizacao,
+        PersonalidadeAnimal? personalidade)
     {
         ResponsavelId = responsavelId;
         Nome = nome;
@@ -65,5 +79,8 @@ public class Animal
         Porte = porte;
         PesoKg = pesoKg;
         Observacoes = observacoes;
+        FotoUrl = fotoUrl;
+        Localizacao = localizacao;
+        Personalidade = personalidade;
     }
 }

@@ -39,6 +39,14 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                     b.Property<string>("Especie")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("FotoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Localizacao")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -46,6 +54,9 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Observacoes")
                         .HasColumnType("longtext");
+
+                    b.Property<int?>("Personalidade")
+                        .HasColumnType("int");
 
                     b.Property<decimal?>("PesoKg")
                         .HasColumnType("decimal(65,30)");

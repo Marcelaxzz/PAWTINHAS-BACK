@@ -130,11 +130,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Application\\Pawtinhas.Application.csproj",
+      "projectUniqueName": "C:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Application\\Pawtinhas.Application.csproj",
       "projectName": "Pawtinhas.Application",
-      "projectPath": "c:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Application\\Pawtinhas.Application.csproj",
+      "projectPath": "C:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Application\\Pawtinhas.Application.csproj",
       "packagesPath": "C:\\Users\\Murilo\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Application\\obj\\",
+      "outputPath": "C:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Application\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Murilo\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -150,8 +150,8 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "c:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Domain\\Pawtinhas.Domain.csproj": {
-              "projectPath": "c:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Domain\\Pawtinhas.Domain.csproj"
+            "C:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Domain\\Pawtinhas.Domain.csproj": {
+              "projectPath": "C:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Domain\\Pawtinhas.Domain.csproj"
             }
           }
         }
