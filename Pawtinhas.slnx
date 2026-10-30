@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Pawtinhas.API/Pawtinhas.API.csproj" />
+    <Project Path="src/Pawtinhas.Application/Pawtinhas.Application.csproj" />
+    <Project Path="src/Pawtinhas.Domain/Pawtinhas.Domain.csproj" />
+    <Project Path="src/Pawtinhas.Infrastructure/Pawtinhas.Infrastructure.csproj" />
+  </Folder>
+</Solution>

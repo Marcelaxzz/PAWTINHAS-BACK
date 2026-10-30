@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "+zRiErIM7Qw=",
+  "success": true,
+  "projectFilePath": "c:\\Users\\Murilo\\Documents\\PAWTINHAS-BACK\\src\\Pawtinhas.Application\\Pawtinhas.Application.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Murilo\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\10.0.13\\microsoft.extensions.dependencyinjection.10.0.13.nupkg.sha512",
+    "C:\\Users\\Murilo\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.13\\microsoft.extensions.dependencyinjection.abstractions.10.0.13.nupkg.sha512"
+  ],
+  "logs": []
+}
