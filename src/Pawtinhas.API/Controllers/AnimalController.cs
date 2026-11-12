@@ -1,10 +1,12 @@
 
 using Microsoft.AspNetCore.Mvc;
+using Pawtinhas.API.Http;
 using Pawtinhas.Application.DTOs;
 using Pawtinhas.Application.Services;
 
 namespace Pawtinhas.API.Controllers;
 
+/// <summary>Pacientes da clínica (animais com tutor). Os da vitrine de adoção ficam em /api/adocao.</summary>
 [ApiController]
 [Route("api/[controller]")]
 public class AnimalsController : ControllerBase
@@ -42,7 +44,7 @@ public class AnimalsController : ControllerBase
         var animal = await _service.ObterAnimalPorIdAsync(id);
 
         if (animal is null)
-            return NotFound();
+            return Erros.NaoEncontrado("Paciente não encontrado.");
 
         return Ok(animal);
     }
@@ -54,10 +56,10 @@ public class AnimalsController : ControllerBase
     {
         var atualizado = await _service.AtualizarAnimalAsync(id, dto);
 
-        if (!atualizado)
-            return NotFound();
+        if (atualizado is null)
+            return Erros.NaoEncontrado("Paciente não encontrado.");
 
-        return NoContent();
+        return Ok(atualizado);
     }
 
     [HttpDelete("{id:int}")]
@@ -66,7 +68,7 @@ public class AnimalsController : ControllerBase
         var removido = await _service.ExcluirAnimalAsync(id);
 
         if (!removido)
-            return NotFound();
+            return Erros.NaoEncontrado("Paciente não encontrado.");
 
         return NoContent();
     }

@@ -5,6 +5,9 @@ namespace Pawtinhas.Domain.Enums
         INATIVO,
         EM_CIRURGIA,
         EM_DOACAO,
-        ADOTADO
+        ADOTADO,
+
+        /// <summary>Animal da vitrine com uma adoção em andamento (entrevista, visita).</summary>
+        EM_PROCESSO_ADOCAO
     }
 }

@@ -5,6 +5,10 @@ using Pawtinhas.Infrastructure.Data;
 
 namespace Pawtinhas.Infrastructure.Repositories;
 
+/// <summary>
+/// CRUD genérico. Os métodos de leitura são virtuais para cada repositório incluir
+/// os relacionamentos de que a tela precisa (tutor do animal, paciente do alarme...).
+/// </summary>
 public class RepositoryBase<T> : IRepository<T> where T : class
 {
     protected readonly AppDbContext _context;
@@ -26,12 +30,12 @@ public class RepositoryBase<T> : IRepository<T> where T : class
         _dbSet.Update(entidade);
     }
 
-    public async Task<T?> ObterPorIdAsync(int id)
+    public virtual async Task<T?> ObterPorIdAsync(int id)
     {
         return await _dbSet.FindAsync(id);
     }
 
-    public async Task<IReadOnlyList<T>> ObterTodosAsync()
+    public virtual async Task<IReadOnlyList<T>> ObterTodosAsync()
     {
         return await _dbSet.ToListAsync();
     }

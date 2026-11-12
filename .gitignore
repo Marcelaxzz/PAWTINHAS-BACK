@@ -1,0 +1,21 @@
+# Build
+**/bin/
+**/obj/
+/obj/
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Segredos e dados locais: nunca vão para o repositório
+.env
+appsettings.*.local.json
+**/dados/
+*.pfx
+
+# Wi-Fi e chave do alarme ESP32
+firmware/**/segredos.h
+firmware/**/.pio/

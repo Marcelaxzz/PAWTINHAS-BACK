@@ -22,6 +22,48 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("Pawtinhas.Domain.Alarme", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AnimalId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(140)
+                        .HasColumnType("varchar(140)");
+
+                    b.Property<TimeOnly>("Hora")
+                        .HasColumnType("time(6)");
+
+                    b.Property<DateOnly>("Inicio")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
+
+                    b.Property<string>("Recorrencia")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnimalId");
+
+                    b.ToTable("Alarmes", (string)null);
+                });
+
             modelBuilder.Entity("Pawtinhas.Domain.Animal", b =>
                 {
                     b.Property<int>("Id")
@@ -37,7 +79,8 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Especie")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
 
                     b.Property<string>("FotoUrl")
                         .HasMaxLength(500)
@@ -53,21 +96,24 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                         .HasColumnType("varchar(150)");
 
                     b.Property<string>("Observacoes")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
 
                     b.Property<int?>("Personalidade")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("PesoKg")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
 
                     b.Property<int?>("Porte")
                         .HasColumnType("int");
 
                     b.Property<string>("Raca")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
 
-                    b.Property<int>("ResponsavelId")
+                    b.Property<int?>("ResponsavelId")
                         .HasColumnType("int");
 
                     b.Property<string>("Sexo")
@@ -82,7 +128,146 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ResponsavelId");
 
+                    b.HasIndex("Status");
+
                     b.ToTable("Animais", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.ConfiguracaoClinica", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AlarmesEsp32")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("AtualizadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("BackupAutomatico")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Cnpj")
+                        .IsRequired()
+                        .HasMaxLength(18)
+                        .HasColumnType("varchar(18)");
+
+                    b.Property<DateTime?>("DispositivoUltimoContato")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Endereco")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<string>("NomeClinica")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<bool>("ResumoDiarioEmail")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Telefone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTime?>("UltimoBackup")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("UltimoResumo")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ConfiguracoesClinica", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.DesafioCodigo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CodigoHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("ExpiraEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Finalidade")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("LembrarSessao")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("ReenvioPermitidoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Reenvios")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SenhaPendenteHash")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<int>("Tentativas")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UsadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpiraEm");
+
+                    b.HasIndex("UsuarioId", "Finalidade", "CriadoEm");
+
+                    b.ToTable("DesafiosCodigo", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.DisparoAlarme", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AlarmeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
+
+                    b.Property<DateTime>("Quando")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Resultado")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlarmeId");
+
+                    b.HasIndex("Quando");
+
+                    b.ToTable("DisparosAlarme", (string)null);
                 });
 
             modelBuilder.Entity("Pawtinhas.Domain.Evento", b =>
@@ -93,8 +278,11 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AnimalId")
+                    b.Property<int?>("AnimalId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("DataHora")
                         .HasColumnType("datetime(6)");
@@ -105,21 +293,693 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                         .HasColumnType("varchar(13)");
 
                     b.Property<string>("Observacoes")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<int?>("ProfissionalId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AnimalId");
 
-                    b.ToTable("Eventos");
+                    b.HasIndex("DataHora");
+
+                    b.HasIndex("ProfissionalId");
+
+                    b.ToTable("Eventos", (string)null);
 
                     b.HasDiscriminator().HasValue("Evento");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.ItemEstoque", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Categoria")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("Minimo")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Categoria", "ItemId")
+                        .IsUnique();
+
+                    b.ToTable("ItensEstoque", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.LoteEstoque", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("ItemEstoqueId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantidade")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<DateOnly?>("Validade")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemEstoqueId");
+
+                    b.ToTable("LotesEstoque", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.Material", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Especificacao")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("Observacoes")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("Unidade")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Materiais", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.Medicamento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Concentracao")
+                        .HasPrecision(12, 4)
+                        .HasColumnType("decimal(12,4)");
+
+                    b.Property<decimal?>("DoseMaxCao")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal?>("DoseMaxGato")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal?>("DoseMaximaMg")
+                        .HasPrecision(12, 4)
+                        .HasColumnType("decimal(12,4)");
+
+                    b.Property<decimal?>("DoseMinCao")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal?>("DoseMinGato")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<string>("Fonte")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("Forma")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<bool>("Fracionavel")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int?>("IntervaloPadraoHoras")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("Observacoes")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("PrincipioAtivo")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("Unidade")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("Via")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Medicamentos", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.Medicao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AlturaChao")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<int>("AnimalId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ComprimentoMembro")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal?>("LarguraEncaixe")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<decimal>("LarguraPata")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<int>("Leituras")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Membro")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("Metodo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnimalId");
+
+                    b.ToTable("Medicoes", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.MovimentacaoEstoque", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("ItemEstoqueId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Lotes")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<decimal>("Quantidade")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<decimal>("SaldoApos")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CriadoEm");
+
+                    b.HasIndex("ItemEstoqueId");
+
+                    b.ToTable("MovimentacoesEstoque", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.PerfilAdocao", b =>
+                {
+                    b.Property<int>("AnimalId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Castrado")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("ConviveAnimais")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("ConviveCriancas")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateOnly>("DataEntrada")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(600)
+                        .HasColumnType("varchar(600)");
+
+                    b.Property<string>("Frase")
+                        .IsRequired()
+                        .HasMaxLength(140)
+                        .HasColumnType("varchar(140)");
+
+                    b.Property<string>("InfoAdicional")
+                        .IsRequired()
+                        .HasMaxLength(140)
+                        .HasColumnType("varchar(140)");
+
+                    b.Property<string>("Necessidades")
+                        .IsRequired()
+                        .HasMaxLength(140)
+                        .HasColumnType("varchar(140)");
+
+                    b.Property<string>("Sobre")
+                        .IsRequired()
+                        .HasMaxLength(1200)
+                        .HasColumnType("varchar(1200)");
+
+                    b.Property<string>("Tracos")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<bool>("Vacinado")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("AnimalId");
+
+                    b.ToTable("PerfisAdocao", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.PlanoAlimentar", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AguaMaxMlDia")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.Property<decimal>("AguaMinMlDia")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.Property<int>("AnimalId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Condicao")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Especie")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<decimal>("Fator")
+                        .HasPrecision(4, 2)
+                        .HasColumnType("decimal(4,2)");
+
+                    b.Property<decimal>("GramasDia")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.Property<decimal>("GramasPorRefeicao")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.Property<decimal>("KcalPetiscosMax")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.Property<decimal>("KcalPorKg")
+                        .HasPrecision(8, 2)
+                        .HasColumnType("decimal(8,2)");
+
+                    b.Property<decimal>("Mer")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.Property<string>("Observacoes")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<decimal>("PesoAtualKg")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<decimal>("PesoCalculoKg")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<string>("Racao")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<int?>("RacaoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Refeicoes")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Rer")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnimalId");
+
+                    b.HasIndex("RacaoId");
+
+                    b.ToTable("PlanosAlimentares", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.Prescricao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AlarmeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AlertasConfirmados")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<int>("AnimalId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Concentracao")
+                        .HasPrecision(12, 4)
+                        .HasColumnType("decimal(12,4)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal>("DoseMg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<decimal>("DoseMgKg")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("DoseRealMg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<int>("DuracaoDias")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly>("HoraPrimeiraDose")
+                        .HasColumnType("time(6)");
+
+                    b.Property<DateOnly>("Inicio")
+                        .HasColumnType("date");
+
+                    b.Property<int>("IntervaloHoras")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Medicamento")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<int?>("MedicamentoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Observacoes")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<decimal>("PesoKg")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<decimal>("QuantidadePorDose")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("QuantidadeTotal")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<int>("TotalDoses")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Unidade")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("Via")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlarmeId");
+
+                    b.HasIndex("AnimalId");
+
+                    b.HasIndex("MedicamentoId");
+
+                    b.ToTable("Prescricoes", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.Profissional", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("Funcao")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Profissionais", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.Racao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Especie")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("Fase")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("FotoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<decimal>("KcalPorKg")
+                        .HasPrecision(8, 2)
+                        .HasColumnType("decimal(8,2)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("Observacoes")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Racoes", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.RelatorioServico", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AtualizadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Avaliacao")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Diagnostico")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<int>("EventoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Orientacoes")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<decimal?>("PesoKg")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<string>("Procedimentos")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<string>("Queixa")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("Responsavel")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<DateOnly?>("Retorno")
+                        .HasColumnType("date");
+
+                    b.Property<decimal?>("TemperaturaC")
+                        .HasPrecision(4, 1)
+                        .HasColumnType("decimal(4,1)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventoId")
+                        .IsUnique();
+
+                    b.ToTable("RelatoriosServico", (string)null);
                 });
 
             modelBuilder.Entity("Pawtinhas.Domain.Responsavel", b =>
@@ -175,13 +1035,100 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                     b.ToTable("Responsaveis", (string)null);
                 });
 
+            modelBuilder.Entity("Pawtinhas.Domain.SessaoUsuario", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("ExpiraEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("Familia")
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("Persistente")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime?>("RevogadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("SubstituidoPor")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Familia");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("SessoesUsuario", (string)null);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.Usuario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AtualizadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("BloqueadoAte")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("varchar(254)");
+
+                    b.Property<int>("FalhasLogin")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("SenhaHash")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Usuarios", (string)null);
+                });
+
             modelBuilder.Entity("Pawtinhas.Domain.BanhoTosa", b =>
                 {
                     b.HasBaseType("Pawtinhas.Domain.Evento");
 
                     b.Property<string>("TipoServico")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
 
                     b.HasDiscriminator().HasValue("BanhoTosa");
                 });
@@ -192,7 +1139,8 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Procedimento")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
 
                     b.HasDiscriminator().HasValue("Cirurgia");
                 });
@@ -203,13 +1151,9 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Motivo")
                         .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.ToTable("Eventos", t =>
-                        {
-                            t.Property("Motivo")
-                                .HasColumnName("Consulta_Motivo");
-                        });
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("Consulta_Motivo");
 
                     b.HasDiscriminator().HasValue("Consulta");
                 });
@@ -218,13 +1162,19 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                 {
                     b.HasBaseType("Pawtinhas.Domain.Evento");
 
+                    b.Property<string>("DescricaoAnimal")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
                     b.Property<string>("Motivo")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
 
                     b.Property<string>("Prioridade")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.HasDiscriminator().HasValue("Emergencia");
                 });
@@ -238,7 +1188,18 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Local")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<string>("Periodo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("Servico")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
 
                     b.HasDiscriminator().HasValue("PetSitter");
                 });
@@ -247,15 +1208,30 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                 {
                     b.HasBaseType("Pawtinhas.Domain.Evento");
 
+                    b.Property<DateTime?>("AplicadaEm")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Dose")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("NomeVacina")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
 
                     b.HasDiscriminator().HasValue("Vacina");
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.Alarme", b =>
+                {
+                    b.HasOne("Pawtinhas.Domain.Animal", "Animal")
+                        .WithMany()
+                        .HasForeignKey("AnimalId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Animal");
                 });
 
             modelBuilder.Entity("Pawtinhas.Domain.Animal", b =>
@@ -263,13 +1239,54 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                     b.HasOne("Pawtinhas.Domain.Responsavel", "Responsavel")
                         .WithMany("Animais")
                         .HasForeignKey("ResponsavelId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Responsavel");
                 });
 
+            modelBuilder.Entity("Pawtinhas.Domain.DesafioCodigo", b =>
+                {
+                    b.HasOne("Pawtinhas.Domain.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.DisparoAlarme", b =>
+                {
+                    b.HasOne("Pawtinhas.Domain.Alarme", null)
+                        .WithMany()
+                        .HasForeignKey("AlarmeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
             modelBuilder.Entity("Pawtinhas.Domain.Evento", b =>
+                {
+                    b.HasOne("Pawtinhas.Domain.Animal", "Animal")
+                        .WithMany()
+                        .HasForeignKey("AnimalId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Pawtinhas.Domain.Profissional", "Profissional")
+                        .WithMany()
+                        .HasForeignKey("ProfissionalId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Animal");
+
+                    b.Navigation("Profissional");
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.LoteEstoque", b =>
+                {
+                    b.HasOne("Pawtinhas.Domain.ItemEstoque", null)
+                        .WithMany("Lotes")
+                        .HasForeignKey("ItemEstoqueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.Medicao", b =>
                 {
                     b.HasOne("Pawtinhas.Domain.Animal", "Animal")
                         .WithMany()
@@ -278,6 +1295,89 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Animal");
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.MovimentacaoEstoque", b =>
+                {
+                    b.HasOne("Pawtinhas.Domain.ItemEstoque", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemEstoqueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.PerfilAdocao", b =>
+                {
+                    b.HasOne("Pawtinhas.Domain.Animal", null)
+                        .WithOne("PerfilAdocao")
+                        .HasForeignKey("Pawtinhas.Domain.PerfilAdocao", "AnimalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.PlanoAlimentar", b =>
+                {
+                    b.HasOne("Pawtinhas.Domain.Animal", null)
+                        .WithMany()
+                        .HasForeignKey("AnimalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pawtinhas.Domain.Racao", null)
+                        .WithMany()
+                        .HasForeignKey("RacaoId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.Prescricao", b =>
+                {
+                    b.HasOne("Pawtinhas.Domain.Alarme", null)
+                        .WithMany()
+                        .HasForeignKey("AlarmeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Pawtinhas.Domain.Animal", null)
+                        .WithMany()
+                        .HasForeignKey("AnimalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pawtinhas.Domain.Medicamento", null)
+                        .WithMany()
+                        .HasForeignKey("MedicamentoId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.RelatorioServico", b =>
+                {
+                    b.HasOne("Pawtinhas.Domain.Evento", "Evento")
+                        .WithMany()
+                        .HasForeignKey("EventoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Evento");
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.SessaoUsuario", b =>
+                {
+                    b.HasOne("Pawtinhas.Domain.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.Animal", b =>
+                {
+                    b.Navigation("PerfilAdocao");
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.ItemEstoque", b =>
+                {
+                    b.Navigation("Lotes");
                 });
 
             modelBuilder.Entity("Pawtinhas.Domain.Responsavel", b =>

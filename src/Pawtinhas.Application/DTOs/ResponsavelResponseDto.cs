@@ -14,6 +14,7 @@ public class ResponsavelResponseDto
     public string? Endereco { get; set; }
     public string? Cidade { get; set; }
     public string? UF { get; set; }
+    public int QuantidadeAnimais { get; set; }
 
     public static ResponsavelResponseDto FromEntity(Responsavel responsavel)
     {
@@ -27,7 +28,8 @@ public class ResponsavelResponseDto
             CEP = responsavel.CEP,
             Endereco = responsavel.Endereco,
             Cidade = responsavel.Cidade,
-            UF = responsavel.UF
+            UF = responsavel.UF,
+            QuantidadeAnimais = responsavel.Animais.Count
         };
     }
 }

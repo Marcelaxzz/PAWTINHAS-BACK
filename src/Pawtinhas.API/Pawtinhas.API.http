@@ -1,6 +1,9 @@
 @Pawtinhas.API_HostAddress = http://localhost:5135
 
-GET {{Pawtinhas.API_HostAddress}}/weatherforecast/
+# Rotas públicas. As demais exigem a sessão (cookie) aberta pelo login em duas etapas
+# e o cabeçalho X-XSRF-TOKEN nas que alteram dados.
+
+GET {{Pawtinhas.API_HostAddress}}/api/adocao
 Accept: application/json
 
 ###

@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Mvc;
+using Pawtinhas.API.Http;
 using Pawtinhas.Application.DTOs;
 using Pawtinhas.Application.Services;
 
@@ -42,7 +43,7 @@ public class ResponsaveisController : ControllerBase
         var responsavel = await _service.ObterPorIdAsync(id);
 
         if (responsavel is null)
-            return NotFound();
+            return Erros.NaoEncontrado("Tutor não encontrado.");
 
         return Ok(responsavel);
     }
@@ -54,10 +55,10 @@ public class ResponsaveisController : ControllerBase
     {
         var atualizado = await _service.AtualizarAsync(id, dto);
 
-        if (!atualizado)
-            return NotFound();
+        if (atualizado is null)
+            return Erros.NaoEncontrado("Tutor não encontrado.");
 
-        return NoContent();
+        return Ok(atualizado);
     }
 
     [HttpDelete("{id:int}")]
@@ -66,7 +67,7 @@ public class ResponsaveisController : ControllerBase
         var removido = await _service.ExcluirAsync(id);
 
         if (!removido)
-            return NotFound();
+            return Erros.NaoEncontrado("Tutor não encontrado.");
 
         return NoContent();
     }
