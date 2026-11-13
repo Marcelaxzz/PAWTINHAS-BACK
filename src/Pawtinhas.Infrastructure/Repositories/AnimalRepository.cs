@@ -13,6 +13,9 @@ public class AnimalRepository : RepositoryBase<Animal>, IAnimalRepository
     {
     }
 
+    public async Task<IReadOnlyList<Animal>> ListarPorResponsavelAsync(int responsavelId) =>
+        await _dbSet.Where(a => a.ResponsavelId == responsavelId).OrderBy(a => a.Nome).ToListAsync();
+
     public override Task<Animal?> ObterPorIdAsync(int id) =>
         _dbSet.Include(a => a.Responsavel).FirstOrDefaultAsync(a => a.Id == id);
 

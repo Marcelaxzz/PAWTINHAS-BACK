@@ -15,6 +15,7 @@ services:
       BancoDeDados__MigrarAoIniciar: "true"
       Jwt__Chave: ${JWT_CHAVE:?Defina JWT_CHAVE no .env}
       Email__Senha: ${EMAIL_SENHA_APP:-}
+      Email__Modo: "Pasta"
       Dispositivo__Chave: ${DISPOSITIVO_CHAVE:-}
     volumes:
       - pawtinhas_dados:/app/dados

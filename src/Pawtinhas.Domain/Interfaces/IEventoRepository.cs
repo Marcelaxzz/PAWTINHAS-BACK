@@ -13,4 +13,7 @@ public interface IEventoRepository : IRepository<Evento>
 
     /// <summary>Compromissos de um dia (visitas de pet sitter que cobrem o dia também entram).</summary>
     Task<IReadOnlyList<Evento>> ListarDoDiaAsync(DateOnly dia);
+
+        /// <summary>Compromissos dos animais de um tutor (nunca de outros), opcionalmente de um só animal.</summary>
+    Task<IReadOnlyList<Evento>> ListarDoResponsavelAsync(int responsavelId, int? animalId);
 }

@@ -24,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<EventoAppService>();
         services.AddScoped<AdocaoAppService>();
         services.AddScoped<ProfissionalAppService>();
+        services.AddScoped<TutorAppService>(); 
         services.AddScoped<MedicamentoAppService>();
         services.AddScoped<RacaoAppService>();
         services.AddScoped<MaterialAppService>();
@@ -43,6 +44,7 @@ public static class DependencyInjection
         services.AddScoped<ServicoAutenticacao>();
         services.AddScoped<ServicoSessoes>();
         services.AddScoped<ServicoUsuario>();
+        services.AddScoped<ServicoContas>();
         services.AddSingleton<ModelosEmail>();
 
         return services;

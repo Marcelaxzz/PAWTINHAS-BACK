@@ -13,6 +13,8 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.Email).IsRequired().HasMaxLength(254);
         builder.Property(u => u.SenhaHash).IsRequired().HasMaxLength(200);
         builder.HasIndex(u => u.Email).IsUnique();
+        builder.HasIndex(u => u.ResponsavelId).IsUnique();   // uma conta por tutor (admin fica NULL)
+        builder.HasOne<Responsavel>().WithMany().HasForeignKey(u => u.ResponsavelId).OnDelete(DeleteBehavior.Cascade);
     }
 }
 

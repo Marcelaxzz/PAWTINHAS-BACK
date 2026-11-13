@@ -2,12 +2,19 @@ using Microsoft.EntityFrameworkCore;
 using Pawtinhas.Domain;
 using Pawtinhas.Domain.Interfaces;
 using Pawtinhas.Infrastructure.Data;
+using Pawtinhas.Domain.Enums;
 
 namespace Pawtinhas.Infrastructure.Repositories;
 
 public class UsuarioRepository(AppDbContext context) : RepositoryBase<Usuario>(context), IUsuarioRepository
 {
     public Task<Usuario?> ObterPorEmailAsync(string email) => _dbSet.FirstOrDefaultAsync(u => u.Email == email);
+
+    public async Task<IReadOnlyList<Usuario>> ListarTutoresAsync() =>
+    await _dbSet.Where(u => u.Papel == PapelUsuario.TUTOR).OrderBy(u => u.Nome).ToListAsync();
+
+    public Task<Usuario?> ObterPorResponsavelAsync(int responsavelId) =>
+        _dbSet.FirstOrDefaultAsync(u => u.ResponsavelId == responsavelId);
 }
 
 public class DesafioCodigoRepository(AppDbContext context) : IDesafioCodigoRepository

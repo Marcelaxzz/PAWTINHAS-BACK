@@ -5,6 +5,10 @@ namespace Pawtinhas.Domain.Interfaces;
 public interface IUsuarioRepository : IRepository<Usuario>
 {
     Task<Usuario?> ObterPorEmailAsync(string email);
+    
+    Task<IReadOnlyList<Usuario>> ListarTutoresAsync();
+
+    Task<Usuario?> ObterPorResponsavelAsync(int responsavelId);
 }
 
 public interface IDesafioCodigoRepository

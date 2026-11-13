@@ -1,3 +1,4 @@
+using Pawtinhas.Domain.Enums;
 namespace Pawtinhas.Domain;
 
 /// <summary>
@@ -9,6 +10,8 @@ public class Usuario
     public int Id { get; private set; }
     public string Nome { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
+    public PapelUsuario Papel { get; private set; }
+    public int? ResponsavelId { get; private set; }
 
     /// <summary>Hash PBKDF2 (ASP.NET Core Identity).</summary>
     public string SenhaHash { get; private set; } = string.Empty;
@@ -22,12 +25,16 @@ public class Usuario
 
     public Usuario(string nome, string email, string senhaHash, DateTime agora)
     {
+        Papel = PapelUsuario.VETERINARIA;
         Nome = nome.Trim();
         Email = NormalizarEmail(email);
         SenhaHash = senhaHash;
         CriadoEm = agora;
         AtualizadoEm = agora;
     }
+
+    public static Usuario NovoTutor(string nome, string email, string senhaHash, int responsavelId, DateTime agora) =>
+        new(nome, email, senhaHash, agora) { Papel = PapelUsuario.TUTOR, ResponsavelId = responsavelId };
 
     public static string NormalizarEmail(string email) => email.Trim().ToLowerInvariant();
 

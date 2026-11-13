@@ -19,6 +19,13 @@ public class EventoRepository
             .AnyAsync(animal => animal.Id == animalId);
     }
 
+    public async Task<IReadOnlyList<Evento>> ListarDoResponsavelAsync(int responsavelId, int? animalId)
+    {
+        var consulta = Completo().Where(e => e.Animal!.ResponsavelId == responsavelId);
+        if (animalId is { } id) consulta = consulta.Where(e => e.AnimalId == id);
+        return await consulta.OrderBy(e => e.DataHora).ToListAsync();
+    }
+
     public async Task<IReadOnlyList<Evento>> ListarAsync(Type? tipo, int? animalId)
     {
         var consulta = Completo();

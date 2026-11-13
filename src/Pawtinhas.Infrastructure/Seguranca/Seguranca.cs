@@ -65,6 +65,17 @@ public sealed class GeradorTokenAcesso(IOptions<JwtOptions> opcoes, TimeProvider
         var agora = relogio.GetUtcNow().UtcDateTime;
         var expira = agora.AddMinutes(_jwt.MinutosAcesso);
 
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(JwtRegisteredClaimNames.Email, usuario.Email),
+            new(Claims.Sessao, sessao.ToString()),
+            new("name", usuario.Nome),
+            new("role", Papeis.De(usuario.Papel)),
+        };
+        if (usuario.ResponsavelId is { } responsavelId) claims.Add(new Claim(Claims.Responsavel, responsavelId.ToString()));
+
         var descritor = new SecurityTokenDescriptor
         {
             Issuer = _jwt.Emissor,
@@ -73,15 +84,7 @@ public sealed class GeradorTokenAcesso(IOptions<JwtOptions> opcoes, TimeProvider
             NotBefore = agora,
             Expires = expira,
             SigningCredentials = new SigningCredentials(Chave(_jwt), SecurityAlgorithms.HmacSha256),
-            Subject = new ClaimsIdentity(
-            [
-                new Claim(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, usuario.Email),
-                new Claim(Claims.Sessao, sessao.ToString()),
-                new Claim("name", usuario.Nome),
-                new Claim("role", Papeis.Veterinaria),
-            ]),
+            Subject = new ClaimsIdentity(claims),
         };
 
         return new TokenAcesso(new JsonWebTokenHandler().CreateToken(descritor), expira);

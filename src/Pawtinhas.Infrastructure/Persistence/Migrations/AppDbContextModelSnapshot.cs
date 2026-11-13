@@ -1108,6 +1108,12 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("varchar(80)");
 
+                    b.Property<int>("Papel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ResponsavelId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SenhaHash")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1116,6 +1122,9 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("ResponsavelId")
                         .IsUnique();
 
                     b.ToTable("Usuarios", (string)null);
@@ -1368,6 +1377,14 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Pawtinhas.Domain.Usuario", b =>
+                {
+                    b.HasOne("Pawtinhas.Domain.Responsavel", null)
+                        .WithMany()
+                        .HasForeignKey("ResponsavelId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Pawtinhas.Domain.Animal", b =>

@@ -34,6 +34,16 @@ public sealed class ModelosEmail(IOptions<AutenticacaoOptions> auth, IOptions<Fr
             $"Olá, {PrimeiroNome(nome)}!\n\n{corpo}\n\nEquipe Pawtinhas");
     }
 
+    public MensagemEmail ContaCriada(string email, string nome)
+    {
+        const string titulo = "Seu acesso ao Pawtinhas foi criado";
+        const string corpo = "A clínica criou o seu acesso para acompanhar seus pets e os compromissos deles. "
+            + "Para entrar, abra a página de login, escolha “Esqueceu a senha?” e crie a sua senha com o código que vamos enviar a este e-mail.";
+        return new MensagemEmail(email, nome, titulo,
+            Layout(titulo, $"<p style=\"margin:0 0 16px;\">Olá, {Html(PrimeiroNome(nome))}!</p><p style=\"margin:0;\">{Html(corpo)}</p>"),
+            $"Olá, {PrimeiroNome(nome)}!\n\n{corpo}\n\nEquipe Pawtinhas");
+    }
+
     public MensagemEmail ResumoDiario(string email, string nome, DateOnly dia, IReadOnlyList<ItemAgenda> itens)
     {
         var data = dia.ToString("dd/MM/yyyy");

@@ -144,14 +144,13 @@ public sealed class ServicoAutenticacao(
 
     // ---------- Auxiliares ----------
 
-    /// <summary>A conta só é buscada se o e-mail for o permitido; qualquer outro se comporta como "sem conta".</summary>
-    private async Task<Usuario?> BuscarPermitidoAsync(string email)
-    {
-        var normalizado = Usuario.NormalizarEmail(email);
-        return normalizado == Usuario.NormalizarEmail(_cfg.EmailPermitido)
-            ? await usuarios.ObterPorEmailAsync(normalizado)
-            : null;
-    }
+
+    /// <summary>
+    /// Busca a conta pelo e-mail (veterinária ou tutor). Quem não tem conta recebe o mesmo tratamento de
+    /// "e-mail ou senha incorretos". Contas de tutor só nascem pela veterinária: não há cadastro aberto.
+    /// </summary>
+    private async Task<Usuario?> BuscarPermitidoAsync(string email) =>
+        await usuarios.ObterPorEmailAsync(Usuario.NormalizarEmail(email));
 
     private (DesafioCodigo Desafio, string Codigo) NovoDesafio(
         FinalidadeCodigo finalidade, int? usuarioId, bool lembrar, string? senhaPendente, DateTime agora)

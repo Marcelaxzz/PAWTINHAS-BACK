@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pawtinhas.API.Http;
 using Pawtinhas.Application.DTOs;
 using Pawtinhas.Application.Services;
+using Pawtinhas.Application.Autenticacao;
 
 namespace Pawtinhas.API.Controllers;
 
@@ -14,7 +15,8 @@ namespace Pawtinhas.API.Controllers;
 [Route("api/adocao")]
 public class AdocaoController(AdocaoAppService service) : ControllerBase
 {
-    private bool Autenticado => User.Identity?.IsAuthenticated == true;
+    // Só a veterinária vê os já adotados e os dados do adotante. Tutor logado vê a vitrine como visitante.
+    private bool Autenticado => User.IsInRole(Papeis.Veterinaria);
 
     [HttpGet]
     [AllowAnonymous]

@@ -108,6 +108,9 @@ public static class DependenciasApi
         var politicaVeterinaria = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().RequireRole(Papeis.Veterinaria).Build();
         services.AddAuthorizationBuilder()
             .SetFallbackPolicy(politicaVeterinaria)
-            .SetDefaultPolicy(politicaVeterinaria);
+            .SetDefaultPolicy(politicaVeterinaria)
+            .AddPolicy(Politicas.Admin, politicaVeterinaria)
+            .AddPolicy(Politicas.Tutor, p => p.RequireAuthenticatedUser().RequireRole(Papeis.Tutor));
+            
     }
 }
