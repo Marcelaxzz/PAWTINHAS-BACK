@@ -59,30 +59,3 @@ public class AlarmeAppService(IAlarmeRepository repository, IAnimalRepository an
     }
 }
 
-/// <summary>Medições para prótese 3D. O histórico fica na ficha do paciente.</summary>
-public class MedicaoAppService(IMedicaoRepository repository, IAnimalRepository animais, IUnitOfWork unitOfWork, TimeProvider relogio)
-{
-    public async Task<IReadOnlyList<MedicaoResponseDto>> ListarAsync(int? animalId) =>
-        (await repository.ListarAsync(animalId)).Select(MedicaoResponseDto.FromEntity).ToList();
-
-    public async Task<MedicaoResponseDto> CadastrarAsync(SalvarMedicaoDto dto)
-    {
-        if (await animais.ObterPorIdAsync(dto.AnimalId) is not { EhPaciente: true })
-            throw new DominioException("animalId", "Paciente não encontrado. Selecione outro.");
-
-        var medicao = new Medicao(dto.AnimalId, dto.Membro, dto.ComprimentoMembro ?? 0, dto.AlturaChao ?? 0,
-            dto.LarguraPata ?? 0, dto.LarguraEncaixe, dto.Metodo, dto.Leituras ?? 1,
-            dto.CriadoEm ?? relogio.GetLocalNow().DateTime);
-        await repository.AdicionarAsync(medicao);
-        await unitOfWork.CommitAsync();
-        return MedicaoResponseDto.FromEntity(medicao);
-    }
-
-    public async Task<bool> ExcluirAsync(int id)
-    {
-        if (await repository.ObterPorIdAsync(id) is not { } medicao) return false;
-        repository.Remover(medicao);
-        await unitOfWork.CommitAsync();
-        return true;
-    }
-}

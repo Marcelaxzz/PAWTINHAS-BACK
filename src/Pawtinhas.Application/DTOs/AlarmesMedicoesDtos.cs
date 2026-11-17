@@ -40,24 +40,3 @@ public sealed record DisparoDispositivoDto(
     [Required(ErrorMessage = "Informe o resultado."), StringLength(60)] string Resultado,
     DateTime? Quando = null);
 
-// ---------- Medições para prótese 3D ----------
-
-public sealed record SalvarMedicaoDto(
-    [Range(1, int.MaxValue, ErrorMessage = "Selecione o paciente.")] int AnimalId,
-    string? Membro,
-    [Required(ErrorMessage = "Informe o comprimento do membro.")] decimal? ComprimentoMembro,
-    [Required(ErrorMessage = "Informe a altura até o chão.")] decimal? AlturaChao,
-    [Required(ErrorMessage = "Informe a largura da pata.")] decimal? LarguraPata,
-    decimal? LarguraEncaixe,
-    string? Metodo,
-    int? Leituras,
-    DateTime? CriadoEm);
-
-public sealed record MedicaoResponseDto(
-    int Id, int AnimalId, string? Membro, decimal ComprimentoMembro, decimal AlturaChao, decimal LarguraPata,
-    decimal? LarguraEncaixe, string Metodo, int Leituras, DateTime CriadoEm)
-{
-    public static MedicaoResponseDto FromEntity(Medicao m) => new(
-        m.Id, m.AnimalId, m.Membro, m.ComprimentoMembro, m.AlturaChao, m.LarguraPata, m.LarguraEncaixe,
-        m.Metodo, m.Leituras, m.CriadoEm);
-}

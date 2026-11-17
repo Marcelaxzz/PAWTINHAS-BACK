@@ -22,15 +22,6 @@ public class AlarmeRepository(AppDbContext context) : RepositoryBase<Alarme>(con
     public async Task AdicionarDisparoAsync(DisparoAlarme disparo) => await _context.DisparosAlarme.AddAsync(disparo);
 }
 
-public class MedicaoRepository(AppDbContext context) : RepositoryBase<Medicao>(context), IMedicaoRepository
-{
-    public async Task<IReadOnlyList<Medicao>> ListarAsync(int? animalId) =>
-        await _dbSet.AsNoTracking()
-            .Where(m => animalId == null || m.AnimalId == animalId)
-            .OrderByDescending(m => m.CriadoEm)
-            .ToListAsync();
-}
-
 public class PrescricaoRepository(AppDbContext context) : RepositoryBase<Prescricao>(context), IPrescricaoRepository
 {
     public async Task<IReadOnlyList<Prescricao>> ListarAsync(int? animalId) =>

@@ -46,7 +46,6 @@ public class RelatorioAppService(
     IAnimalRepository animais,
     IPrescricaoRepository prescricoes,
     IPlanoAlimentarRepository planos,
-    IMedicaoRepository medicoes,
     IAlarmeRepository alarmes,
     IConfiguracaoRepository configuracao,
     EstoqueAppService estoque,
@@ -299,20 +298,6 @@ public class RelatorioAppService(
                 ]).ToList(),
                 [1f, 2f, 1.6f, 1.2f, 1.8f],
                 "Nenhum plano alimentar calculado."),
-            new BlocoTabela("Medições para prótese 3D",
-                ["Data", "Membro", "Comprimento", "Altura ao chão", "Pata", "Encaixe", "Método"],
-                (await medicoes.ListarAsync(animalId)).Select(m => (IReadOnlyList<string>)
-                [
-                    m.CriadoEm.ToString("dd/MM/yyyy", Br),
-                    m.Membro ?? "—",
-                    $"{Numero(m.ComprimentoMembro)} cm",
-                    $"{Numero(m.AlturaChao)} cm",
-                    $"{Numero(m.LarguraPata)} cm",
-                    m.LarguraEncaixe is { } le ? $"{Numero(le)} cm" : "—",
-                    m.Metodo,
-                ]).ToList(),
-                [1f, 1.4f, 1f, 1f, 0.8f, 0.8f, 1.3f],
-                "Nenhuma medição registrada."),
             new BlocoTabela($"Histórico de atendimentos ({historico.Count})",
                 ["Data", "Serviço", "Detalhe", "Profissional", "Situação", "Relatório"],
                 historico.Select(e => (IReadOnlyList<string>)

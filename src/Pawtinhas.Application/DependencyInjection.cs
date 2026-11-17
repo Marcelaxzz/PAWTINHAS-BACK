@@ -28,7 +28,6 @@ public static class DependencyInjection
         services.AddScoped<RacaoAppService>();
         services.AddScoped<MaterialAppService>();
         services.AddScoped<AlarmeAppService>();
-        services.AddScoped<MedicaoAppService>();
         services.AddScoped<DispositivoAppService>();
         services.AddScoped<ConfiguracaoAppService>();
         services.AddScoped<ResolvedorCalculos>();

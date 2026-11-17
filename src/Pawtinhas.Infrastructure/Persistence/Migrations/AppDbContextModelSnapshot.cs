@@ -496,55 +496,6 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                     b.ToTable("Medicamentos", (string)null);
                 });
 
-            modelBuilder.Entity("Pawtinhas.Domain.Medicao", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AlturaChao")
-                        .HasPrecision(6, 2)
-                        .HasColumnType("decimal(6,2)");
-
-                    b.Property<int>("AnimalId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ComprimentoMembro")
-                        .HasPrecision(6, 2)
-                        .HasColumnType("decimal(6,2)");
-
-                    b.Property<DateTime>("CriadoEm")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<decimal?>("LarguraEncaixe")
-                        .HasPrecision(6, 2)
-                        .HasColumnType("decimal(6,2)");
-
-                    b.Property<decimal>("LarguraPata")
-                        .HasPrecision(6, 2)
-                        .HasColumnType("decimal(6,2)");
-
-                    b.Property<int>("Leituras")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Membro")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<string>("Metodo")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AnimalId");
-
-                    b.ToTable("Medicoes", (string)null);
-                });
-
             modelBuilder.Entity("Pawtinhas.Domain.MovimentacaoEstoque", b =>
                 {
                     b.Property<int>("Id")
@@ -1121,6 +1072,29 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                     b.ToTable("Usuarios", (string)null);
                 });
 
+            modelBuilder.Entity("Pawtinhas.Infrastructure.Armazenamento.ArquivoArmazenado", b =>
+                {
+                    b.Property<string>("Nome")
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<byte[]>("Dados")
+                        .IsRequired()
+                        .HasColumnType("longblob");
+
+                    b.Property<string>("TipoConteudo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("Nome");
+
+                    b.ToTable("Arquivos", (string)null);
+                });
+
             modelBuilder.Entity("Pawtinhas.Domain.BanhoTosa", b =>
                 {
                     b.HasBaseType("Pawtinhas.Domain.Evento");
@@ -1284,17 +1258,6 @@ namespace Pawtinhas.Infrastructure.Persistence.Migrations
                         .HasForeignKey("ItemEstoqueId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Pawtinhas.Domain.Medicao", b =>
-                {
-                    b.HasOne("Pawtinhas.Domain.Animal", "Animal")
-                        .WithMany()
-                        .HasForeignKey("AnimalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Animal");
                 });
 
             modelBuilder.Entity("Pawtinhas.Domain.MovimentacaoEstoque", b =>

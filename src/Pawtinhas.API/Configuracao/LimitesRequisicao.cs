@@ -63,21 +63,28 @@ public sealed class ProxyReversoOptions
     /// </summary>
     public string[] Enderecos { get; init; } = [];
 
+    /// <summary>
+    /// Quantos proxies ficam na frente da API. 1 = só o do Railway; 2 = a Vercel repassa /api para o
+    /// Railway, e o IP do visitante é o que a Vercel anotou, um salto antes.
+    /// </summary>
+    public int Saltos { get; init; } = 1;
+
     public static ForwardedHeadersOptions? Opcoes(IConfiguration config)
     {
-        var enderecos = config.GetSection(Secao).Get<ProxyReversoOptions>()?.Enderecos ?? [];
+        var proxy = config.GetSection(Secao).Get<ProxyReversoOptions>();
+        var enderecos = proxy?.Enderecos ?? [];
         if (enderecos.Length == 0) return null;
 
         var opcoes = new ForwardedHeadersOptions
         {
             ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
-            ForwardLimit = 1,
+            ForwardLimit = Math.Clamp(proxy?.Saltos ?? 1, 1, 3),
         };
         opcoes.KnownProxies.Clear();
         opcoes.KnownIPNetworks.Clear();
         // "*": a API só é alcançada pelo proxy da hospedagem (Railway), que não tem IP fixo.
-        // Com as duas listas vazias, o cabeçalho é aceito de qualquer origem e ForwardLimit = 1
-        // pega só o último salto, o IP que o próprio proxy anotou.
+        // Com as duas listas vazias, o cabeçalho é aceito de qualquer origem e ForwardLimit (Saltos)
+        // limita quantos saltos do fim da lista são lidos.
         if (enderecos is ["*"]) return opcoes;
         foreach (var endereco in enderecos)
         {

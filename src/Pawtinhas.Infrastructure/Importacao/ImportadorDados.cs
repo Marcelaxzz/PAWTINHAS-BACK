@@ -102,9 +102,6 @@ public sealed partial class ImportadorDados(AppDbContext db, IArmazenamentoFotos
         await Colecao(raiz, "historicoAlarmes", j => Ref<Alarme>(j, "alarmeId") is { } alarme
             ? new DisparoAlarme(alarme, DateTime.Parse(Txt(j, "quando"), CultureInfo.InvariantCulture), Txt(j, "resultado"))
             : null);
-        await Colecao(raiz, "medicoes", j => new Medicao(Pet(j), Opc(j, "membro"), Dec(j, "comprimentoMembro") ?? 0,
-            Dec(j, "alturaChao") ?? 0, Dec(j, "larguraPata") ?? 0, Dec(j, "larguraEncaixe"), Opc(j, "metodo"),
-            (int)(Dec(j, "leituras") ?? 1), DateTime.Parse(Txt(j, "criadoEm"), CultureInfo.InvariantCulture)));
         await Colecao(raiz, "prescricoes", j => Prescricao(j));
         await Colecao(raiz, "planosAlimentares", j => Plano(j));
 
@@ -268,7 +265,6 @@ public sealed partial class ImportadorDados(AppDbContext db, IArmazenamentoFotos
         await db.DisparosAlarme.ExecuteDeleteAsync();
         await db.Prescricoes.ExecuteDeleteAsync();
         await db.PlanosAlimentares.ExecuteDeleteAsync();
-        await db.Medicoes.ExecuteDeleteAsync();
         await db.Eventos.ExecuteDeleteAsync();
         await db.Alarmes.ExecuteDeleteAsync();
         await db.PerfisAdocao.ExecuteDeleteAsync();

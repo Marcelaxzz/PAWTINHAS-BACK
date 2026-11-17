@@ -125,19 +125,3 @@ public class AlarmesController(AlarmeAppService service) : ControllerBase
         await service.ExcluirAsync(id) ? NoContent() : Erros.NaoEncontrado("Alarme não encontrado.");
 }
 
-/// <summary>Medições para a prótese 3D.</summary>
-[ApiController]
-[Route("api/[controller]")]
-public class MedicoesController(MedicaoAppService service) : ControllerBase
-{
-    [HttpGet]
-    public async Task<IActionResult> Listar([FromQuery] int? animalId) => Ok(await service.ListarAsync(animalId));
-
-    [HttpPost]
-    public async Task<IActionResult> Cadastrar([FromBody] SalvarMedicaoDto dto) =>
-        StatusCode(StatusCodes.Status201Created, await service.CadastrarAsync(dto));
-
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> Excluir(int id) =>
-        await service.ExcluirAsync(id) ? NoContent() : Erros.NaoEncontrado("Medição não encontrada.");
-}

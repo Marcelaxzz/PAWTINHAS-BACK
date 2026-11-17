@@ -11,7 +11,7 @@ A base é a da equipe: camadas, repositórios e UnitOfWork.
 ```
 src/
 ├── Pawtinhas.Domain/          Entidades com regras (Animal, Responsavel, Evento e tipos de agenda, Alarme,
-│                              Medicao, Medicamento, Prescricao, PlanoAlimentar, Usuario...), enums,
+│                              Medicamento, Prescricao, PlanoAlimentar, Usuario...), enums,
 │                              interfaces dos repositórios e os cálculos clínicos (Calculos/).
 ├── Pawtinhas.Application/     DTOs e serviços de aplicação (*AppService), login em duas etapas
 │                              (Autenticacao/), modelos de e-mail e opções de configuração.
@@ -155,7 +155,6 @@ Todos sob `/api`. As rotas da equipe foram mantidas (`/animals`, `/responsaveis`
 | `/adocao` | GET e `/{id}` públicos; POST, PUT, DELETE | Vitrine de adoção |
 | `/profissionais`, `/medicamentos`, `/racoes` | GET, POST, PUT, DELETE | Cadastros |
 | `/alarmes` | GET, POST, PUT, DELETE, `/{id}/ativo` PATCH, `/historico` GET | Alarmes (ESP32, app e navegador). `inicio` (data) define o dia de "Semanal" e "Somente hoje" |
-| `/medicoes?animalId=` | GET, POST, DELETE | Medições da prótese 3D |
 | `/calculos/fatores`, `/calculos/dose`, `/calculos/alimentacao` | GET, POST, POST | Simulações |
 | `/prescricoes`, `/planos-alimentares` | GET, POST, DELETE (+ PATCH na prescrição) | Salvos na ficha |
 | `/configuracoes`, `/configuracoes/status`, `/configuracoes/backup` | GET, PUT, GET, GET | Clínica |

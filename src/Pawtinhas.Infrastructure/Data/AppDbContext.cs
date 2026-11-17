@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Pawtinhas.Domain;
+using Pawtinhas.Infrastructure.Armazenamento;
 
 namespace Pawtinhas.Infrastructure.Data;
 
@@ -23,7 +24,6 @@ public class AppDbContext(
     public DbSet<Profissional> Profissionais { get; set; } = null!;
     public DbSet<Alarme> Alarmes { get; set; } = null!;
     public DbSet<DisparoAlarme> DisparosAlarme { get; set; } = null!;
-    public DbSet<Medicao> Medicoes { get; set; } = null!;
     public DbSet<Medicamento> Medicamentos { get; set; } = null!;
     public DbSet<Racao> Racoes { get; set; } = null!;
     public DbSet<Material> Materiais { get; set; } = null!;
@@ -38,6 +38,9 @@ public class AppDbContext(
     public DbSet<Usuario> Usuarios { get; set; } = null!;
     public DbSet<DesafioCodigo> DesafiosCodigo { get; set; } = null!;
     public DbSet<SessaoUsuario> Sessoes { get; set; } = null!;
+
+    /// <summary>Cópia das fotos no banco (a pasta de arquivos pode não ser permanente).</summary>
+    public DbSet<ArquivoArmazenado> Arquivos { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,15 +1,22 @@
 using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Pawtinhas.Application.Abstracoes;
 using Pawtinhas.Domain.Comum;
 using Pawtinhas.Infrastructure.Configuracao;
+using Pawtinhas.Infrastructure.Data;
 
 namespace Pawtinhas.Infrastructure.Armazenamento;
 
-/// <summary>Fotos gravadas em disco (Armazenamento:Pasta) com nome aleatório de 128 bits.</summary>
+/// <summary>
+/// Fotos com nome aleatório de 128 bits. Ficam no banco (tabela Arquivos, permanente) e numa pasta
+/// em disco (Armazenamento:Pasta) que serve de cópia rápida: se a pasta sumir, como no Render
+/// gratuito a cada reinício, o arquivo é regravado a partir do banco no primeiro pedido.
+/// </summary>
 public sealed partial class ArmazenamentoFotos : IArmazenamentoFotos
 {
     public const string PrefixoUrl = "/api/arquivos/";
@@ -17,12 +24,21 @@ public sealed partial class ArmazenamentoFotos : IArmazenamentoFotos
     private readonly string _pasta;
     private readonly long _limiteBytes;
     private readonly ILogger<ArmazenamentoFotos> _log;
+    private readonly IServiceScopeFactory _escopos;
+    private readonly TimeProvider _relogio;
 
-    public ArmazenamentoFotos(IOptions<ArmazenamentoOptions> opcoes, IHostEnvironment env, ILogger<ArmazenamentoFotos> log)
+    public ArmazenamentoFotos(
+        IOptions<ArmazenamentoOptions> opcoes,
+        IHostEnvironment env,
+        ILogger<ArmazenamentoFotos> log,
+        IServiceScopeFactory escopos,
+        TimeProvider relogio)
     {
         _pasta = Path.GetFullPath(Path.Combine(env.ContentRootPath, opcoes.Value.Pasta));
         _limiteBytes = opcoes.Value.TamanhoMaximoMb * 1024L * 1024L;
         _log = log;
+        _escopos = escopos;
+        _relogio = relogio;
         Directory.CreateDirectory(_pasta);
     }
 
@@ -45,6 +61,13 @@ public sealed partial class ArmazenamentoFotos : IArmazenamentoFotos
         var bytes = memoria.ToArray();
         var extensao = DetectarExtensao(bytes) ?? throw new DominioException("arquivo", "Envie uma imagem PNG, JPG ou WebP.");
         var nome = $"{Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(16))}.{extensao}";
+
+        await using (var escopo = _escopos.CreateAsyncScope())
+        {
+            var db = escopo.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Arquivos.Add(new ArquivoArmazenado(nome, TipoConteudo(nome), bytes, _relogio.GetUtcNow().UtcDateTime));
+            await db.SaveChangesAsync(ct);
+        }
         await File.WriteAllBytesAsync(Path.Combine(_pasta, nome), bytes, ct);
         return PrefixoUrl + nome;
     }
@@ -56,7 +79,7 @@ public sealed partial class ArmazenamentoFotos : IArmazenamentoFotos
 
         if (url.StartsWith(PrefixoUrl, StringComparison.Ordinal))
         {
-            return CaminhoFisico(url[PrefixoUrl.Length..]) is { } caminho && File.Exists(caminho)
+            return Localizar(url[PrefixoUrl.Length..]) is not null
                 ? url
                 : throw new DominioException(campo, "Foto não encontrada. Envie a imagem novamente.");
         }
@@ -73,9 +96,13 @@ public sealed partial class ArmazenamentoFotos : IArmazenamentoFotos
     public void RemoverSeLocal(string? url)
     {
         if (url is null || !url.StartsWith(PrefixoUrl, StringComparison.Ordinal)) return;
-        if (CaminhoFisico(url[PrefixoUrl.Length..]) is not { } caminho) return;
+        var nome = url[PrefixoUrl.Length..];
+        if (CaminhoFisico(nome) is not { } caminho) return;
         try
         {
+            using var escopo = _escopos.CreateScope();
+            escopo.ServiceProvider.GetRequiredService<AppDbContext>().Arquivos
+                .Where(a => a.Nome == nome).ExecuteDelete();
             File.Delete(caminho);
         }
         catch (IOException ex)
@@ -84,10 +111,19 @@ public sealed partial class ArmazenamentoFotos : IArmazenamentoFotos
         }
     }
 
-    public ArquivoFoto? Localizar(string nome) =>
-        CaminhoFisico(nome) is { } caminho && File.Exists(caminho)
-            ? new ArquivoFoto(caminho, TipoConteudo(nome))
-            : null;
+    public ArquivoFoto? Localizar(string nome)
+    {
+        if (CaminhoFisico(nome) is not { } caminho) return null;
+        if (File.Exists(caminho)) return new ArquivoFoto(caminho, TipoConteudo(nome));
+
+        // Fora do disco (pasta apagada no reinício): busca no banco e regrava a cópia local.
+        using var escopo = _escopos.CreateScope();
+        var arquivo = escopo.ServiceProvider.GetRequiredService<AppDbContext>().Arquivos
+            .AsNoTracking().FirstOrDefault(a => a.Nome == nome);
+        if (arquivo is null) return null;
+        File.WriteAllBytes(caminho, arquivo.Dados);
+        return new ArquivoFoto(caminho, arquivo.TipoConteudo);
+    }
 
     /// <summary>Caminho físico de um nome de arquivo. Só aceita nomes gerados por nós (sem "../").</summary>
     private string? CaminhoFisico(string nome) => NomeValido().IsMatch(nome) ? Path.Combine(_pasta, nome) : null;

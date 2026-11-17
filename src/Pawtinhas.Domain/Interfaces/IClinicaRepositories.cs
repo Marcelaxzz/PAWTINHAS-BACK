@@ -12,11 +12,6 @@ public interface IAlarmeRepository : IRepository<Alarme>
     Task AdicionarDisparoAsync(DisparoAlarme disparo);
 }
 
-public interface IMedicaoRepository : IRepository<Medicao>
-{
-    Task<IReadOnlyList<Medicao>> ListarAsync(int? animalId);
-}
-
 public interface IPrescricaoRepository : IRepository<Prescricao>
 {
     Task<IReadOnlyList<Prescricao>> ListarAsync(int? animalId);

@@ -42,7 +42,6 @@ public sealed class ServicoBackup(IServiceScopeFactory escopos, IOptions<Armazen
                 .Select(e => new { tipo = e.GetType().Name, dados = (object)e }).ToList(),
             ["alarmes"] = await db.Alarmes.AsNoTracking().ToListAsync(ct),
             ["disparosAlarme"] = await db.DisparosAlarme.AsNoTracking().ToListAsync(ct),
-            ["medicoes"] = await db.Medicoes.AsNoTracking().ToListAsync(ct),
             ["medicamentos"] = await db.Medicamentos.AsNoTracking().ToListAsync(ct),
             ["racoes"] = await db.Racoes.AsNoTracking().ToListAsync(ct),
             ["materiais"] = await db.Materiais.AsNoTracking().ToListAsync(ct),

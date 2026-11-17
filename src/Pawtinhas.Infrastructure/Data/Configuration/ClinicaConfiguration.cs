@@ -42,22 +42,6 @@ public class DisparoAlarmeConfiguration : IEntityTypeConfiguration<DisparoAlarme
     }
 }
 
-/// <summary>Medições para prótese 3D (centímetros).</summary>
-public class MedicaoConfiguration : IEntityTypeConfiguration<Medicao>
-{
-    public void Configure(EntityTypeBuilder<Medicao> builder)
-    {
-        builder.ToTable("Medicoes");
-        builder.Property(m => m.Membro).HasMaxLength(20);
-        builder.Property(m => m.Metodo).IsRequired().HasMaxLength(20);
-        builder.Property(m => m.ComprimentoMembro).HasPrecision(6, 2);
-        builder.Property(m => m.AlturaChao).HasPrecision(6, 2);
-        builder.Property(m => m.LarguraPata).HasPrecision(6, 2);
-        builder.Property(m => m.LarguraEncaixe).HasPrecision(6, 2);
-        builder.HasOne(m => m.Animal).WithMany().HasForeignKey(m => m.AnimalId).OnDelete(DeleteBehavior.Cascade);
-    }
-}
-
 public class MedicamentoConfiguration : IEntityTypeConfiguration<Medicamento>
 {
     public void Configure(EntityTypeBuilder<Medicamento> builder)
