@@ -87,25 +87,26 @@ A senha nunca vai como argumento da linha de comando, porque ficaria no históri
 
 ## Publicar no Railway
 
-São três serviços no mesmo projeto do Railway: **MySQL**, **API** (este repositório) e **site** ([PAWTINHAS-FRONT](https://github.com/Marcelaxzz/PAWTINHAS-FRONT)). Só o site ganha domínio público: ele repassa `/api` para a API pela rede interna, e assim os cookies de sessão (SameSite=Strict) funcionam.
+No projeto **pawtinhas** do Railway ficam o **MySQL** e a **API** (este repositório), em **https://api-production-68c6ec4d.up.railway.app**. O site ([PAWTINHAS-FRONT](https://github.com/Marcelaxzz/PAWTINHAS-FRONT)) fica na Vercel, em **https://pawtinhas.vercel.app**, e repassa `/api` para a API. Para o navegador, tudo fica no mesmo domínio, e os cookies de sessão (SameSite=Strict) funcionam.
 
 1. **MySQL:** *New* > *Database* > *MySQL*.
-2. **API:** *New* > *GitHub Repo* > `PAWTINHAS-BACK`. O Railway monta pelo `Dockerfile`. Não gere domínio público para ela. Em *Settings* > *Volumes*, crie um volume montado em `/app/dados` (fotos e backups). Em *Variables*:
+2. **API:** *New* > *Empty Service* e `railway up --service api` nesta pasta (o Railway monta pelo `Dockerfile`). Gere o domínio público dela. Em *Settings* > *Volumes*, crie um volume montado em `/app/dados` (fotos e backups). Em *Variables*:
 
    | Variável | Valor |
    | --- | --- |
    | `ConnectionStrings__DefaultConnection` | `Server=${{MySQL.MYSQLHOST}};Port=${{MySQL.MYSQLPORT}};Database=${{MySQL.MYSQLDATABASE}};User=${{MySQL.MYSQLUSER}};Password=${{MySQL.MYSQLPASSWORD}}` |
    | `Jwt__Chave` | 48+ caracteres aleatórios (veja `.env.example`) |
    | `Email__Senha` | Senha de app do Gmail de pawtinhas04@gmail.com |
-   | `Frontend__Url` | Endereço público do site, ex.: `https://pawtinhas.up.railway.app` (links dos e-mails) |
+   | `Frontend__Url` | `https://pawtinhas.vercel.app` (links dos e-mails) |
    | `BancoDeDados__MigrarAoIniciar` | `true` |
-   | `ProxyReverso__Enderecos__0` | `*` (a API só recebe pedidos pelo proxy do Railway) |
+   | `ProxyReverso__Enderecos__0` | `*` (a API só recebe pedidos por proxies) |
+   | `ProxyReverso__Saltos` | `2` (a Vercel e o Railway ficam na frente da API) |
    | `Dispositivo__PortaDescoberta` | `0` (o Railway não tem UDP) |
    | `Dispositivo__Chave` | Chave do alarme ESP32 (vazia desliga) |
    | `RAILWAY_RUN_UID` | `0` (o volume do Railway só aceita gravação do root) |
-   | `PORT` | `8080` (a porta que o site usa para chegar na API) |
+   | `PORT` | `8080` (porta do domínio público da API) |
 
-3. **Site:** siga a seção "Railway" do README do Front.
+3. **Site:** siga a seção "Vercel" do README do Front.
 4. **Conta da veterinária**, uma vez, depois do primeiro deploy. Com a [CLI do Railway](https://docs.railway.com/guides/cli), na pasta deste repositório:
 
    ```powershell
