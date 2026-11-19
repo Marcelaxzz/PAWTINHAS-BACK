@@ -96,9 +96,9 @@ No projeto **pawtinhas** do Railway ficam o **MySQL** e a **API** (este reposit�
    | --- | --- |
    | `ConnectionStrings__DefaultConnection` | `Server=${{MySQL.MYSQLHOST}};Port=${{MySQL.MYSQLPORT}};Database=${{MySQL.MYSQLDATABASE}};User=${{MySQL.MYSQLUSER}};Password=${{MySQL.MYSQLPASSWORD}}` |
    | `Jwt__Chave` | 48+ caracteres aleatórios (veja `.env.example`) |
-   | `Email__Modo` | `AppsScript` (o Railway bloqueia SMTP fora do plano Pro; veja abaixo) |
-   | `Email__UrlAppsScript` | Endereço do app da web do script de e-mail |
-   | `Email__TokenAppsScript` | 32+ caracteres aleatórios, iguais ao `TOKEN` do script |
+   | `Email__Modo` | `Http` (o Railway bloqueia SMTP fora do plano Pro; veja abaixo) |
+   | `Email__UrlEnvio` | `https://pawtinhas.vercel.app/api/correio` |
+   | `Email__TokenEnvio` | 32+ caracteres aleatórios, iguais ao `EMAIL_TOKEN` da Vercel |
    | `Frontend__Url` | `https://pawtinhas.vercel.app` (links dos e-mails) |
    | `BancoDeDados__MigrarAoIniciar` | `true` |
    | `ProxyReverso__Enderecos__0` | `*` (a API só recebe pedidos por proxies) |
@@ -108,16 +108,10 @@ No projeto **pawtinhas** do Railway ficam o **MySQL** e a **API** (este reposit�
    | `RAILWAY_RUN_UID` | `0` (o volume do Railway só aceita gravação do root) |
    | `PORT` | `8080` (porta do domínio público da API) |
 
-   **E-mail no Railway.** Fora do plano Pro, o Railway bloqueia as portas de SMTP, e o envio pelo Gmail fica esperando até
-   desistir. Por isso os e-mails saem por HTTPS, por um Google Apps Script na própria conta pawtinhas04@gmail.com:
-
-   1. Entre em https://script.google.com com a conta pawtinhas04@gmail.com e crie um **Novo projeto**.
-   2. Cole o conteúdo de `scripts/email-apps-script.gs`, com o mesmo valor de `Email__TokenAppsScript` no `TOKEN`.
-   3. Escolha a função `testar` e clique em **Executar**. Autorize o acesso ao Gmail; chega um e-mail de teste.
-   4. **Implantar** > **Nova implantação** > tipo **App da Web**, *Executar como*: **Eu**, *Quem pode acessar*:
-      **Qualquer pessoa**. Copie o URL do app da web (termina em `/exec`) para `Email__UrlAppsScript`.
-
-   O e-mail continua saindo do Gmail da clínica. O script só envia quando recebe o token certo.
+   **E-mail no Railway.** Fora do plano Pro, o Railway bloqueia as portas de SMTP, e o envio direto para o Gmail fica
+   esperando até desistir. Por isso a API entrega cada e-mail por HTTPS à função `api/correio` do site, na Vercel, que
+   envia pelo Gmail de pawtinhas04@gmail.com. Na Vercel ficam `EMAIL_USUARIO` (o Gmail), `EMAIL_SENHA` (a senha de app)
+   e `EMAIL_TOKEN` (o mesmo valor de `Email__TokenEnvio`). Sem o token certo, a função recusa o pedido.
 
 3. **Site:** siga a seção "Vercel" do README do Front.
 4. **Conta da veterinária**, uma vez, depois do primeiro deploy. Com a [CLI do Railway](https://docs.railway.com/guides/cli), na pasta deste repositório:

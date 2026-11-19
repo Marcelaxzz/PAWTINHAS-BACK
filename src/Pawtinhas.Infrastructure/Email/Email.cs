@@ -50,20 +50,19 @@ public sealed class EnviadorSmtp(IOptions<EmailOptions> opcoes) : IEnviadorEmail
 }
 
 /// <summary>
-/// Envio pelo Gmail da clínica através de um Google Apps Script publicado como app da web (só HTTPS).
-/// O script confere o token e chama o GmailApp; o e-mail sai da própria conta, como no SMTP.
+/// Envio por HTTPS: a função api/correio do site (Vercel) confere o token e entrega o e-mail ao Gmail
+/// da clínica. O e-mail sai da própria conta, como no SMTP.
 /// </summary>
-public sealed class EnviadorAppsScript(IOptions<EmailOptions> opcoes) : IEnviadorEmail
+public sealed class EnviadorHttp(IOptions<EmailOptions> opcoes) : IEnviadorEmail
 {
-    // O Apps Script responde com um redirecionamento para o resultado; o HttpClient o segue sozinho.
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(30) };
 
     public async Task EnviarAsync(MensagemEmail mensagem, CancellationToken ct)
     {
         var cfg = opcoes.Value;
-        using var resposta = await Http.PostAsJsonAsync(cfg.UrlAppsScript, new
+        using var resposta = await Http.PostAsJsonAsync(cfg.UrlEnvio, new
         {
-            token = cfg.TokenAppsScript,
+            token = cfg.TokenEnvio,
             para = mensagem.Para,
             assunto = mensagem.Assunto,
             html = mensagem.Html,
@@ -76,7 +75,7 @@ public sealed class EnviadorAppsScript(IOptions<EmailOptions> opcoes) : IEnviado
         {
             // Só o começo da resposta vai para o log: nunca o conteúdo do e-mail.
             throw new InvalidOperationException(
-                $"O Apps Script recusou o envio (HTTP {(int)resposta.StatusCode}): {corpo[..Math.Min(corpo.Length, 120)]}");
+                $"O serviço de envio recusou o e-mail (HTTP {(int)resposta.StatusCode}): {corpo[..Math.Min(corpo.Length, 120)]}");
         }
     }
 }
@@ -100,7 +99,7 @@ public sealed class EstadoEmail(IOptions<EmailOptions> opcoes) : IEstadoEmail
     public bool Configurado => opcoes.Value.Modo switch
     {
         ModoEmail.Pasta => true,
-        ModoEmail.AppsScript => !string.IsNullOrEmpty(opcoes.Value.UrlAppsScript) && !string.IsNullOrEmpty(opcoes.Value.TokenAppsScript),
+        ModoEmail.Http => !string.IsNullOrEmpty(opcoes.Value.UrlEnvio) && !string.IsNullOrEmpty(opcoes.Value.TokenEnvio),
         _ => !string.IsNullOrWhiteSpace(opcoes.Value.Host) && !string.IsNullOrEmpty(opcoes.Value.Senha),
     };
 }
