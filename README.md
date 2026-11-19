@@ -96,7 +96,9 @@ No projeto **pawtinhas** do Railway ficam o **MySQL** e a **API** (este reposit�
    | --- | --- |
    | `ConnectionStrings__DefaultConnection` | `Server=${{MySQL.MYSQLHOST}};Port=${{MySQL.MYSQLPORT}};Database=${{MySQL.MYSQLDATABASE}};User=${{MySQL.MYSQLUSER}};Password=${{MySQL.MYSQLPASSWORD}}` |
    | `Jwt__Chave` | 48+ caracteres aleatórios (veja `.env.example`) |
-   | `Email__Senha` | Senha de app do Gmail de pawtinhas04@gmail.com |
+   | `Email__Modo` | `AppsScript` (o Railway bloqueia SMTP fora do plano Pro; veja abaixo) |
+   | `Email__UrlAppsScript` | Endereço do app da web do script de e-mail |
+   | `Email__TokenAppsScript` | 32+ caracteres aleatórios, iguais ao `TOKEN` do script |
    | `Frontend__Url` | `https://pawtinhas.vercel.app` (links dos e-mails) |
    | `BancoDeDados__MigrarAoIniciar` | `true` |
    | `ProxyReverso__Enderecos__0` | `*` (a API só recebe pedidos por proxies) |
@@ -105,6 +107,17 @@ No projeto **pawtinhas** do Railway ficam o **MySQL** e a **API** (este reposit�
    | `Dispositivo__Chave` | Chave do alarme ESP32 (vazia desliga) |
    | `RAILWAY_RUN_UID` | `0` (o volume do Railway só aceita gravação do root) |
    | `PORT` | `8080` (porta do domínio público da API) |
+
+   **E-mail no Railway.** Fora do plano Pro, o Railway bloqueia as portas de SMTP, e o envio pelo Gmail fica esperando até
+   desistir. Por isso os e-mails saem por HTTPS, por um Google Apps Script na própria conta pawtinhas04@gmail.com:
+
+   1. Entre em https://script.google.com com a conta pawtinhas04@gmail.com e crie um **Novo projeto**.
+   2. Cole o conteúdo de `scripts/email-apps-script.gs`, com o mesmo valor de `Email__TokenAppsScript` no `TOKEN`.
+   3. Escolha a função `testar` e clique em **Executar**. Autorize o acesso ao Gmail; chega um e-mail de teste.
+   4. **Implantar** > **Nova implantação** > tipo **App da Web**, *Executar como*: **Eu**, *Quem pode acessar*:
+      **Qualquer pessoa**. Copie o URL do app da web (termina em `/exec`) para `Email__UrlAppsScript`.
+
+   O e-mail continua saindo do Gmail da clínica. O script só envia quando recebe o token certo.
 
 3. **Site:** siga a seção "Vercel" do README do Front.
 4. **Conta da veterinária**, uma vez, depois do primeiro deploy. Com a [CLI do Railway](https://docs.railway.com/guides/cli), na pasta deste repositório:

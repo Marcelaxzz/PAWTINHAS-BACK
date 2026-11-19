@@ -43,6 +43,9 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .Validate(e => e.Modo != ModoEmail.Smtp || !string.IsNullOrWhiteSpace(e.Host),
                 "Configure Email:Host (servidor SMTP) para enviar os códigos de acesso.")
+            .Validate(e => e.Modo != ModoEmail.AppsScript
+                    || (e.UrlAppsScript.StartsWith("https://script.google.com/", StringComparison.Ordinal) && e.TokenAppsScript.Length >= 32),
+                "Configure Email:UrlAppsScript (https://script.google.com/...) e Email:TokenAppsScript (32+ caracteres).")
             .Validate(e => e.Modo != ModoEmail.Pasta || env.IsDevelopment(),
                 "Email:Modo = Pasta só é permitido em desenvolvimento.")
             .ValidateOnStart();
@@ -85,10 +88,12 @@ public static class DependencyInjection
         services.AddSingleton<IEstadoEmail, EstadoEmail>();
         services.AddSingleton<FilaEmails>();
         services.AddSingleton<IFilaEmails>(sp => sp.GetRequiredService<FilaEmails>());
-        services.AddSingleton<IEnviadorEmail>(sp =>
-            sp.GetRequiredService<IOptions<EmailOptions>>().Value.Modo == ModoEmail.Pasta
-                ? ActivatorUtilities.CreateInstance<EnviadorPasta>(sp)
-                : ActivatorUtilities.CreateInstance<EnviadorSmtp>(sp));
+        services.AddSingleton<IEnviadorEmail>(sp => sp.GetRequiredService<IOptions<EmailOptions>>().Value.Modo switch
+        {
+            ModoEmail.Pasta => ActivatorUtilities.CreateInstance<EnviadorPasta>(sp),
+            ModoEmail.AppsScript => ActivatorUtilities.CreateInstance<EnviadorAppsScript>(sp),
+            _ => ActivatorUtilities.CreateInstance<EnviadorSmtp>(sp),
+        });
 
         if (!executandoComando)
         {

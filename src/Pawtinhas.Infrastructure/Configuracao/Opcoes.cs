@@ -21,6 +21,12 @@ public enum ModoEmail
 {
     Smtp,
 
+    /// <summary>
+    /// Pelo Gmail da clínica, via HTTPS: um Google Apps Script publicado na conta recebe o e-mail e o
+    /// envia. Serve para hospedagens que bloqueiam SMTP (o Railway, fora do plano Pro).
+    /// </summary>
+    AppsScript,
+
     /// <summary>Somente desenvolvimento: grava os e-mails como arquivos .eml em vez de enviar.</summary>
     Pasta,
 }
@@ -48,6 +54,12 @@ public sealed class EmailOptions
     public string Remetente { get; init; } = "";
 
     public string NomeRemetente { get; init; } = "Pawtinhas";
+
+    /// <summary>Modo AppsScript: endereço do app da web publicado (https://script.google.com/macros/s/.../exec).</summary>
+    public string UrlAppsScript { get; init; } = "";
+
+    /// <summary>Modo AppsScript: segredo que o script confere antes de enviar (o mesmo do código do script).</summary>
+    public string TokenAppsScript { get; init; } = "";
 
     /// <summary>Pasta usada no modo "Pasta".</summary>
     public string Pasta { get; init; } = "dados/emails";

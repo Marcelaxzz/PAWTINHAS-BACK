@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using System.Threading.Channels;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -48,6 +49,38 @@ public sealed class EnviadorSmtp(IOptions<EmailOptions> opcoes) : IEnviadorEmail
     };
 }
 
+/// <summary>
+/// Envio pelo Gmail da clínica através de um Google Apps Script publicado como app da web (só HTTPS).
+/// O script confere o token e chama o GmailApp; o e-mail sai da própria conta, como no SMTP.
+/// </summary>
+public sealed class EnviadorAppsScript(IOptions<EmailOptions> opcoes) : IEnviadorEmail
+{
+    // O Apps Script responde com um redirecionamento para o resultado; o HttpClient o segue sozinho.
+    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(30) };
+
+    public async Task EnviarAsync(MensagemEmail mensagem, CancellationToken ct)
+    {
+        var cfg = opcoes.Value;
+        using var resposta = await Http.PostAsJsonAsync(cfg.UrlAppsScript, new
+        {
+            token = cfg.TokenAppsScript,
+            para = mensagem.Para,
+            assunto = mensagem.Assunto,
+            html = mensagem.Html,
+            texto = mensagem.Texto,
+            nome = cfg.NomeRemetente,
+        }, ct);
+
+        var corpo = (await resposta.Content.ReadAsStringAsync(ct)).Trim();
+        if (!resposta.IsSuccessStatusCode || corpo != "ok")
+        {
+            // Só o começo da resposta vai para o log: nunca o conteúdo do e-mail.
+            throw new InvalidOperationException(
+                $"O Apps Script recusou o envio (HTTP {(int)resposta.StatusCode}): {corpo[..Math.Min(corpo.Length, 120)]}");
+        }
+    }
+}
+
 /// <summary>Somente desenvolvimento: grava cada e-mail como .eml numa pasta, sem enviar.</summary>
 public sealed class EnviadorPasta(IOptions<EmailOptions> opcoes, IHostEnvironment env, ILogger<EnviadorPasta> log) : IEnviadorEmail
 {
@@ -61,11 +94,15 @@ public sealed class EnviadorPasta(IOptions<EmailOptions> opcoes, IHostEnvironmen
     }
 }
 
-/// <summary>O e-mail está configurado quando há servidor SMTP com senha (ou no modo Pasta, em desenvolvimento).</summary>
+/// <summary>O e-mail está configurado quando o modo escolhido tem o que precisa para enviar.</summary>
 public sealed class EstadoEmail(IOptions<EmailOptions> opcoes) : IEstadoEmail
 {
-    public bool Configurado => opcoes.Value.Modo == ModoEmail.Pasta
-        || (!string.IsNullOrWhiteSpace(opcoes.Value.Host) && !string.IsNullOrEmpty(opcoes.Value.Senha));
+    public bool Configurado => opcoes.Value.Modo switch
+    {
+        ModoEmail.Pasta => true,
+        ModoEmail.AppsScript => !string.IsNullOrEmpty(opcoes.Value.UrlAppsScript) && !string.IsNullOrEmpty(opcoes.Value.TokenAppsScript),
+        _ => !string.IsNullOrWhiteSpace(opcoes.Value.Host) && !string.IsNullOrEmpty(opcoes.Value.Senha),
+    };
 }
 
 /// <summary>Fila em memória lida pelo <see cref="ServicoEnvioEmails"/>.</summary>
