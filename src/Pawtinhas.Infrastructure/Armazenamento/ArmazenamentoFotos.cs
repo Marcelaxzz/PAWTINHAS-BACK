@@ -14,8 +14,8 @@ namespace Pawtinhas.Infrastructure.Armazenamento;
 
 /// <summary>
 /// Fotos com nome aleatório de 128 bits. Ficam no banco (tabela Arquivos, permanente) e numa pasta
-/// em disco (Armazenamento:Pasta) que serve de cópia rápida: se a pasta sumir, como no Render
-/// gratuito a cada reinício, o arquivo é regravado a partir do banco no primeiro pedido.
+/// em disco (Armazenamento:Pasta) que serve de cópia rápida: se a pasta sumir, como num reinício do
+/// contêiner, o arquivo é regravado a partir do banco no primeiro pedido.
 /// </summary>
 public sealed partial class ArmazenamentoFotos : IArmazenamentoFotos
 {
