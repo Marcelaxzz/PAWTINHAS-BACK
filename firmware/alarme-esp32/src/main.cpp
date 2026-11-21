@@ -950,15 +950,67 @@ void cuidarDoBotao() {
   jaAgiu = false;
 }
 
+// Configuração pelo cabo USB, sem precisar do celular. Linhas que começam com '#':
+//   #wifi <rede><TAB><senha>   guarda a rede e conecta
+//   #api <endereço>            fixa o endereço da API (#api sozinho volta ao servidor na internet)
+//   #estado                    mostra rede, IP, API e alarmes
+// Letras soltas continuam valendo: t = toque de teste (um bipe curto), w = abre o portal de Wi-Fi.
+void comandoSerial(String linha) {
+  linha.trim();
+  if (linha.startsWith("wifi ")) {
+    String resto = linha.substring(5);
+    int tab = resto.indexOf('\t');
+    String nome = tab < 0 ? resto : resto.substring(0, tab);
+    String senha = tab < 0 ? "" : resto.substring(tab + 1);
+    nome.trim();
+    if (nome.isEmpty() || nome.length() > 32 || senha.length() > 64) {
+      Serial.println("ERRO: use #wifi <rede><TAB><senha> (rede até 32 letras, senha até 64).");
+      return;
+    }
+    lembrarRede(nome.c_str(), senha.c_str());
+    tentarWifiAgora = true;
+    Serial.printf("OK: rede %s guardada. Conectando...\n", nome.c_str());
+  } else if (linha == "api" || linha.startsWith("api ")) {
+    String api = linha.length() > 3 ? linha.substring(4) : "";
+    api.trim();
+    while (api.endsWith("/")) api.remove(api.length() - 1);
+    strlcpy(apiFixa, api.c_str(), sizeof apiFixa);
+    salvarTexto("apiFixa", apiFixa);
+    situacaoApi = API_PROCURANDO;
+    jaBuscou = false;
+    Serial.printf("OK: API em %s\n", enderecoDaApi().c_str());
+  } else if (linha == "estado") {
+    Serial.printf("ESTADO wifi=%s rede=%s ip=%s api=%s situacao=%d http=%d alarmes=%d\n",
+                  WiFi.status() == WL_CONNECTED ? "conectado" : "desconectado", WiFi.SSID().c_str(),
+                  WiFi.localIP().toString().c_str(), enderecoDaApi().c_str(), (int)situacaoApi, ultimoCodigoHttp,
+                  totalAlarmes);
+  } else {
+    Serial.println("ERRO: comando desconhecido.");
+  }
+}
+
 void testePeloSerial() {
-  if (!Serial.available()) return;
-  char c = Serial.read();
-  if (c == 't' || c == 'T') {
-    Serial.println("Teste do toque.");
-    tela("Teste de alarme", "Hora do remedio!");
-    bipe(1, 300);
-  } else if (c == 'w' || c == 'W') {
-    abrirPortal();
+  static String linha;
+  static bool emComando = false;
+  while (Serial.available()) {
+    char c = Serial.read();
+    if (emComando) {
+      if (c == '\n' || c == '\r') {
+        emComando = false;
+        comandoSerial(linha);
+      } else if (linha.length() < 120) {
+        linha += c;
+      }
+    } else if (c == '#') {
+      emComando = true;
+      linha = "";
+    } else if (c == 't' || c == 'T') {
+      Serial.println("Teste do toque.");
+      tela("Teste de alarme", "Hora do remedio!");
+      bipe(1, 300);
+    } else if (c == 'w' || c == 'W') {
+      abrirPortal();
+    }
   }
 }
 

@@ -4,6 +4,6 @@
 // O mesmo valor de Dispositivo:Chave configurado na API. Também é a senha para gravar sem cabo.
 #define CHAVE_DISPOSITIVO "cole-a-chave-aqui"
 
-// Opcional: endereço fixo da API, se ela estiver publicada na internet (ex.: "https://pawtinhas.com.br").
-// Em branco, a placa procura a API sozinha na rede em que estiver.
-#define API_ENDERECO_PADRAO ""
+// Servidor do Pawtinhas na internet: a placa funciona em qualquer Wi-Fi, sem computador ligado.
+// O endereço digitado no portal (ou "local", para a API de um computador da rede) tem prioridade.
+#define API_ENDERECO_PADRAO "https://pawtinhas.vercel.app"

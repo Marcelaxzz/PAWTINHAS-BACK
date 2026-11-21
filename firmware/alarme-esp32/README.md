@@ -60,6 +60,17 @@ Se a porta da placa não aparecer, instale o driver do chip USB: CP210x (Silicon
 
 O roteador do celular também serve. Só redes de **2,4 GHz** (o ESP32 não conecta em 5 GHz).
 
+## Configurar pelo cabo (sem celular)
+
+Com a placa no USB, abra o **Monitor** do PlatformIO (115200) e digite uma linha começando com `#`:
+
+| Comando | O que faz |
+|---|---|
+| `#wifi NomeDaRede<TAB>senha` | Guarda a rede e conecta |
+| `#api` | Volta a usar o servidor na internet (o padrão) |
+| `#api local` | Usa a API rodando num computador da mesma rede |
+| `#estado` | Mostra rede, IP, endereço da API e quantos alarmes estão guardados |
+
 ## O botão BOOT
 
 | Quando | O que faz |
