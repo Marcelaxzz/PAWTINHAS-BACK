@@ -178,6 +178,10 @@ void buzzer(bool ligado) { digitalWrite(PINO_BUZZER, (ligado != BUZZER_TOCA_EM_L
 
 bool botaoApertado() { return digitalRead(PINO_BOTAO) == LOW; }
 
+// Guarda um toque no BOOT mesmo se a placa estiver ocupada (consultando o servidor) na hora do toque.
+volatile bool botaoFoiApertado = false;
+void IRAM_ATTR aoApertarBotao() { botaoFoiApertado = true; }
+
 void bipe(int vezes, int ms = 120) {
   for (int i = 0; i < vezes; i++) {
     buzzer(true);
@@ -859,6 +863,7 @@ uint8_t tocar(const Alarme *lista[], int quantos, long minuto) {
   unsigned long inicio = millis();
   unsigned long ultimaConsulta = 0;
   long passoNaTela = -1;
+  botaoFoiApertado = false;
   while (millis() - inicio < TOCAR_POR_MS) {
     unsigned long t = millis() - inicio;
     unsigned long fase = t % 2000;
@@ -872,11 +877,12 @@ uint8_t tocar(const Alarme *lista[], int quantos, long minuto) {
       escrever(1, passo % 2 == 0 && a.pet[0] ? a.pet : "Hora do remedio!");
     }
 
-    if (botaoApertado()) goto desligado;
+    if (botaoApertado() || botaoFoiApertado) goto desligado;
 
     if (millis() - ultimaConsulta >= CONSULTAR_PARADA_MS) {
       uint8_t remota = paradaRemota(lista, quantos, minuto);
       ultimaConsulta = millis();
+      if (botaoFoiApertado) goto desligado;  // o botão vale mais que a resposta do servidor
       if (remota != PAROU_SOZINHO) {
         buzzer(false);
         Serial.printf("Desligado %s.\n", remota == PAROU_NO_APP ? "pelo app" : "pelo painel");
@@ -1092,6 +1098,7 @@ void setup() {
   pinMode(PINO_BUZZER, OUTPUT);
   buzzer(false);
   pinMode(PINO_BOTAO, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(PINO_BOTAO), aoApertarBotao, FALLING);
 
   Wire.begin(PINO_SDA, PINO_SCL);
   byte endereco = enderecoDoLcd();
