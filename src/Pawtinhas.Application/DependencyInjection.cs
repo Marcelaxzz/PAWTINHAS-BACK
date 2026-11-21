@@ -29,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<MaterialAppService>();
         services.AddScoped<AlarmeAppService>();
         services.AddScoped<DispositivoAppService>();
+        services.AddSingleton<ParadasDeAlarme>();
         services.AddScoped<ConfiguracaoAppService>();
         services.AddScoped<ResolvedorCalculos>();
         services.AddScoped<CalculoAppService>();

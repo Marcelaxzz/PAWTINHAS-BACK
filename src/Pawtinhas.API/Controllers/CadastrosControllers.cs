@@ -96,10 +96,18 @@ public class MateriaisController(MaterialAppService service) : ControllerBase
 /// <summary>Alarmes tocados pelo ESP32 e o histórico de disparos.</summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AlarmesController(AlarmeAppService service) : ControllerBase
+public class AlarmesController(AlarmeAppService service, ParadasDeAlarme paradas) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> Listar() => Ok(await service.ListarAsync());
+
+    /// <summary>Toques parados nos últimos minutos (o painel e o app consultam enquanto o alarme toca).</summary>
+    [HttpGet("paradas")]
+    public IActionResult Paradas() => Ok(paradas.Recentes());
+
+    /// <summary>Para o toque em todos os aparelhos: painel, app e ESP32.</summary>
+    [HttpPost("paradas")]
+    public IActionResult Parar([FromBody] PararAlarmeDto dto) => Ok(new { marcados = paradas.Registrar(dto, "painel") });
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Obter(int id) =>

@@ -32,6 +32,17 @@ public sealed record DisparoAlarmeResponseDto(int Id, int? AlarmeId, string Nome
 // ---------- ESP32 ----------
 
 /// <summary>Alarme no formato curto do ESP32. Inicio vai como "aaaa-mm-dd".</summary>
+/// <summary>
+/// Parar um toque em todos os aparelhos. Minuto: minutos desde 1970 (UTC) do horário em que o alarme tocou.
+/// Origem: "painel", "app" ou "caixinha".
+/// </summary>
+public sealed record PararAlarmeDto(
+    [Required(ErrorMessage = "Informe os alarmes."), MinLength(1), MaxLength(20)] IReadOnlyList<int> AlarmeIds,
+    [Range(1, long.MaxValue, ErrorMessage = "Informe o minuto do toque.")] long Minuto,
+    [StringLength(20)] string? Origem = null);
+
+public sealed record ParadaAlarmeDto(int AlarmeId, long Minuto, string Origem, DateTimeOffset Em);
+
 public sealed record AlarmeDispositivoDto(int Id, string Nome, string Hora, string Recorrencia, string Inicio, string Descricao, string? Pet);
 
 /// <summary>Quando: hora local em que tocou (o ESP32 guarda os disparos sem internet e manda depois).</summary>

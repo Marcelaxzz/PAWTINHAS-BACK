@@ -12,8 +12,24 @@ namespace Pawtinhas.API.Controllers;
 [ApiController]
 [Route("api/dispositivo")]
 [AllowAnonymous]
-public sealed class DispositivoController(DispositivoAppService dispositivo) : ControllerBase
+public sealed class DispositivoController(DispositivoAppService dispositivo, ParadasDeAlarme paradas) : ControllerBase
 {
+    /// <summary>Enquanto toca, a placa pergunta se alguém parou o alarme no painel ou no app.</summary>
+    [HttpGet("paradas")]
+    public IActionResult Paradas()
+    {
+        dispositivo.Autorizar(ChaveEnviada);
+        return Ok(paradas.Recentes());
+    }
+
+    /// <summary>Desligado no botão da placa: para também no painel e no app.</summary>
+    [HttpPost("paradas")]
+    public IActionResult Parar([FromBody] PararAlarmeDto dto)
+    {
+        dispositivo.Autorizar(ChaveEnviada);
+        return Ok(new { marcados = paradas.Registrar(dto with { Origem = "caixinha" }, "caixinha") });
+    }
+
     private string ChaveEnviada => Request.Headers["X-Device-Key"].ToString();
 
     [HttpGet("alarmes")]

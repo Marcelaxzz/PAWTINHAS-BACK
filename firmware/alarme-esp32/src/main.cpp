@@ -73,10 +73,13 @@ struct Rede {
   char senha[65];
 };
 
+// Como o toque terminou: tocou até o fim, desligado no botão da placa, no painel (site) ou no app.
+enum ComoParou : uint8_t { PAROU_SOZINHO, PAROU_NO_BOTAO, PAROU_NO_PAINEL, PAROU_NO_APP };
+
 struct Disparo {
   int32_t alarmeId;
   time_t quando;
-  bool desligadoNoBotao;
+  uint8_t comoParou;
 };
 
 const int MAX_ALARMES = 30;
@@ -723,7 +726,11 @@ void enviarDisparos() {
     char corpo[128];
     snprintf(corpo, sizeof corpo,
              "{\"alarmeId\":%ld,\"resultado\":\"%s\",\"quando\":\"%04d-%02d-%02dT%02d:%02d:00\"}", (long)d.alarmeId,
-             d.desligadoNoBotao ? "Tocou e foi desligado no botão" : "Tocou", t.tm_year + 1900, t.tm_mon + 1,
+             d.comoParou == PAROU_NO_BOTAO    ? "Tocou e foi desligado no botão"
+             : d.comoParou == PAROU_NO_PAINEL ? "Tocou e foi desligado no painel"
+             : d.comoParou == PAROU_NO_APP    ? "Tocou e foi desligado no app"
+                                              : "Tocou",
+             t.tm_year + 1900, t.tm_mon + 1,
              t.tm_mday, t.tm_hour, t.tm_min);
     HTTPClient http;
     if (!comecar(http, base + "/api/dispositivo/disparos")) return;
@@ -739,12 +746,12 @@ void enviarDisparos() {
   }
 }
 
-void guardarDisparo(const Alarme &a, time_t quando, bool desligado) {
+void guardarDisparo(const Alarme &a, time_t quando, uint8_t comoParou) {
   if (totalPendentes == MAX_PENDENTES) {
     for (int i = 0; i < totalPendentes - 1; i++) pendentes[i] = pendentes[i + 1];
     totalPendentes--;
   }
-  pendentes[totalPendentes++] = {a.id, quando, desligado};
+  pendentes[totalPendentes++] = {a.id, quando, comoParou};
 }
 
 // ---------- Alarmes ----------
@@ -794,8 +801,56 @@ void proximoHorario(char *saida, size_t tamanho) {
   snprintf(saida, tamanho, "Sem proximos");
 }
 
-// Toca até alguém apertar o botão ou passar TOCAR_POR_MS. Devolve true se foi desligado no botão.
-bool tocar(const Alarme *lista[], int quantos) {
+// ---------- Desligar em todos os aparelhos ----------
+// O minuto do toque é o número de minutos desde 1970 (UTC), o mesmo no painel e no app.
+
+// Desligado no botão: avisa o servidor na hora, para o painel e o app pararem também.
+void avisarParada(const Alarme *lista[], int quantos, long minuto) {
+  if (WiFi.status() != WL_CONNECTED || situacaoApi != API_OK) return;
+  String corpo = "{\"alarmeIds\":[";
+  for (int i = 0; i < quantos; i++) {
+    if (i) corpo += ',';
+    corpo += String((long)lista[i]->id);
+  }
+  corpo += "],\"minuto\":" + String(minuto) + "}";
+  HTTPClient http;
+  if (!comecar(http, enderecoDaApi() + "/api/dispositivo/paradas")) return;
+  http.addHeader("X-Device-Key", CHAVE_DISPOSITIVO);
+  http.addHeader("Content-Type", "application/json");
+  int codigo = http.POST(corpo);
+  http.end();
+  Serial.printf("Parada avisada ao servidor (HTTP %d).\n", codigo);
+}
+
+// Enquanto toca: alguém desligou no painel ou no app? Devolve PAROU_NO_PAINEL, PAROU_NO_APP ou PAROU_SOZINHO (não).
+uint8_t paradaRemota(const Alarme *lista[], int quantos, long minuto) {
+  if (WiFi.status() != WL_CONNECTED || situacaoApi != API_OK) return PAROU_SOZINHO;
+  HTTPClient http;
+  if (!comecar(http, enderecoDaApi() + "/api/dispositivo/paradas")) return PAROU_SOZINHO;
+  http.setTimeout(3000);
+  http.addHeader("X-Device-Key", CHAVE_DISPOSITIVO);
+  http.addHeader("Accept", "application/json");
+  int codigo = http.GET();
+  String corpo = codigo == 200 ? http.getString() : String();
+  http.end();
+  if (corpo.isEmpty()) return PAROU_SOZINHO;
+  JsonDocument doc;
+  if (deserializeJson(doc, corpo) || !doc.is<JsonArray>()) return PAROU_SOZINHO;
+  for (JsonObject p : doc.as<JsonArray>()) {
+    long id = p["alarmeId"] | 0L;
+    long m = p["minuto"] | 0L;
+    if (labs(m - minuto) > 1) continue;
+    for (int i = 0; i < quantos; i++) {
+      if (lista[i]->id != id) continue;
+      const char *origem = p["origem"] | "";
+      return !strcmp(origem, "app") ? PAROU_NO_APP : PAROU_NO_PAINEL;
+    }
+  }
+  return PAROU_SOZINHO;
+}
+
+// Toca até alguém apertar o botão, desligar no painel ou no app, ou passar TOCAR_POR_MS. Devolve como parou.
+uint8_t tocar(const Alarme *lista[], int quantos, long minuto) {
   Serial.printf("Tocando: %s%s\n", lista[0]->nome, quantos > 1 ? " e outros" : "");
   lcd->backlight();
   unsigned long inicio = millis();
@@ -817,16 +872,28 @@ bool tocar(const Alarme *lista[], int quantos) {
       }
     }
     passo++;
+    // A cada ~4 s, entre um bipe e outro, pergunta se desligaram no painel ou no app.
+    if (passo % 2 == 0) {
+      uint8_t remota = paradaRemota(lista, quantos, minuto);
+      if (botaoApertado()) goto desligado;
+      if (remota != PAROU_SOZINHO) {
+        buzzer(false);
+        tela("Alarme desligado", remota == PAROU_NO_APP ? "pelo app" : "pelo painel");
+        delay(2000);
+        return remota;
+      }
+    }
   }
   buzzer(false);
-  return false;
+  return PAROU_SOZINHO;
 
 desligado:
   buzzer(false);
   tela("Alarme desligado", "");
+  avisarParada(lista, quantos, minuto);
   while (botaoApertado()) delay(20);
   delay(1200);
-  return true;
+  return PAROU_NO_BOTAO;
 }
 
 void conferirAlarmes() {
@@ -848,8 +915,8 @@ void conferirAlarmes() {
     }
     if (quantos == 0) continue;
     ultimoMinutoConferido = m;  // não toca o mesmo minuto duas vezes, mesmo se algo der errado no meio
-    bool desligado = tocar(agora, quantos);
-    for (int i = 0; i < quantos; i++) guardarDisparo(*agora[i], instante, desligado);
+    uint8_t comoParou = tocar(agora, quantos, m);
+    for (int i = 0; i < quantos; i++) guardarDisparo(*agora[i], instante, comoParou);
     enviarDisparos();
   }
   ultimoMinutoConferido = max(ultimoMinutoConferido, minutoAgora);
