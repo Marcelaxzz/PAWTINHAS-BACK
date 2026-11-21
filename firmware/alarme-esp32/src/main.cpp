@@ -850,39 +850,42 @@ uint8_t paradaRemota(const Alarme *lista[], int quantos, long minuto) {
 }
 
 // Toca até alguém apertar o botão, desligar no painel ou no app, ou passar TOCAR_POR_MS. Devolve como parou.
+// Bipes em ciclos de 2 s (dois de 0,8 s); 1 s depois de cada resposta do servidor, pergunta de novo se desligaram.
+const unsigned long CONSULTAR_PARADA_MS = 1000;
+
 uint8_t tocar(const Alarme *lista[], int quantos, long minuto) {
   Serial.printf("Tocando: %s%s\n", lista[0]->nome, quantos > 1 ? " e outros" : "");
   lcd->backlight();
   unsigned long inicio = millis();
-  int passo = 0;
+  unsigned long ultimaConsulta = 0;
+  long passoNaTela = -1;
   while (millis() - inicio < TOCAR_POR_MS) {
-    const Alarme &a = *lista[(passo / 2) % quantos];
-    escrever(0, a.nome);
-    escrever(1, passo % 2 == 0 && a.pet[0] ? a.pet : "Hora do remedio!");
-    for (int i = 0; i < 2; i++) {
-      buzzer(true);
-      for (int k = 0; k < 40; k++) {
-        if (botaoApertado()) goto desligado;
-        delay(20);
-      }
-      buzzer(false);
-      for (int k = 0; k < 10; k++) {
-        if (botaoApertado()) goto desligado;
-        delay(20);
-      }
+    unsigned long t = millis() - inicio;
+    unsigned long fase = t % 2000;
+    buzzer(fase < 800 || (fase >= 1000 && fase < 1800));
+
+    long passo = t / 2000;
+    if (passo != passoNaTela) {
+      passoNaTela = passo;
+      const Alarme &a = *lista[(passo / 2) % quantos];
+      escrever(0, a.nome);
+      escrever(1, passo % 2 == 0 && a.pet[0] ? a.pet : "Hora do remedio!");
     }
-    passo++;
-    // A cada ~4 s, entre um bipe e outro, pergunta se desligaram no painel ou no app.
-    if (passo % 2 == 0) {
+
+    if (botaoApertado()) goto desligado;
+
+    if (millis() - ultimaConsulta >= CONSULTAR_PARADA_MS) {
       uint8_t remota = paradaRemota(lista, quantos, minuto);
-      if (botaoApertado()) goto desligado;
+      ultimaConsulta = millis();
       if (remota != PAROU_SOZINHO) {
         buzzer(false);
+        Serial.printf("Desligado %s.\n", remota == PAROU_NO_APP ? "pelo app" : "pelo painel");
         tela("Alarme desligado", remota == PAROU_NO_APP ? "pelo app" : "pelo painel");
         delay(2000);
         return remota;
       }
     }
+    delay(20);
   }
   buzzer(false);
   return PAROU_SOZINHO;
