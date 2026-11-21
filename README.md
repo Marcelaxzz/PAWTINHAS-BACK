@@ -123,7 +123,7 @@ No projeto **pawtinhas** do Railway ficam o **MySQL** e a **API** (este reposit�
    dotnet Pawtinhas.API.dll importar Seed/complemento-catalogo.json --acrescentar   # opcional
    ```
 
-A caixinha ESP32 acha a API por UDP na rede local, o que não existe no Railway: ela continua funcionando com a API rodando no computador da clínica.
+A caixinha ESP32 usa este servidor por padrão (https://pawtinhas.vercel.app, que repassa `/api` para o Railway), em qualquer Wi-Fi com internet. A chave dela (`segredos.h`) precisa ser a mesma de `Dispositivo__Chave`.
 
 ## Segurança
 

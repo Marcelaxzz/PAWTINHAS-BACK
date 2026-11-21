@@ -3,7 +3,8 @@
 // Funciona longe do computador, ligado num carregador de celular ou power bank:
 // - Wi-Fi sem nada no código: se não conhece a rede do lugar, a placa abre a rede "Pawtinhas-Alarme".
 //   Pelo celular, escolha o Wi-Fi e digite a senha. Ela guarda até 5 redes e conecta sozinha na que achar.
-// - Acha a API sozinha na rede (pergunta "PAWTINHAS?" por UDP). Dá para fixar um endereço no portal.
+// - Fala com o servidor do Pawtinhas na internet (pawtinhas.vercel.app), sem computador ligado. Para usar
+//   a API de um computador da rede, digite "local" no portal: a placa pergunta "PAWTINHAS?" por UDP.
 // - Guarda os alarmes na memória: sem internet ou com a API desligada, continua tocando os que já recebeu.
 // - Botão BOOT: aperte para desligar o alarme. Com a tela parada, um toque mostra a rede e o IP;
 //   segurando 3 s abre (ou fecha) a configuração do Wi-Fi.
@@ -31,7 +32,7 @@
 #endif
 
 #ifndef API_ENDERECO_PADRAO
-#define API_ENDERECO_PADRAO ""
+#define API_ENDERECO_PADRAO "https://pawtinhas.vercel.app"
 #endif
 
 // ---------- Ligações e ajustes ----------
@@ -89,7 +90,7 @@ int totalRedes = 0;
 Disparo pendentes[MAX_PENDENTES];
 int totalPendentes = 0;
 
-char apiFixa[101] = "";        // digitada no portal (vazia = procurar sozinha)
+char apiFixa[101] = "";        // digitada no portal (vazia = servidor na internet; "local" = procurar na rede)
 char apiEncontrada[101] = "";  // última API que respondeu à procura
 
 enum SituacaoApi { API_PROCURANDO, API_OK, API_SEM_RESPOSTA, API_CHAVE_ERRADA, API_DESLIGADA, API_ERRO };
@@ -402,9 +403,9 @@ void paginaInicial() {
          "<input name=outra placeholder='Nome da rede, se não estiver na lista' style='margin-top:8px'>"
          "<label for=senha>Senha do Wi-Fi</label><input id=senha name=senha type=password autocomplete=off>"
          "<small>Só redes de 2,4 GHz. Vale também o roteador do celular.</small>"
-         "<label for=api>Endereço da API (opcional)</label><input id=api name=api placeholder='Em branco: a caixinha procura sozinha' value='");
+         "<label for=api>Endereço da API (opcional)</label><input id=api name=api placeholder='Em branco: servidor do Pawtinhas na internet' value='");
   h += escaparHtml(apiFixa);
-  h += F("'><small>Preencha só se a API estiver na internet ou em outra rede, ex.: https://pawtinhas.com.br</small>"
+  h += F("'><small>Deixe em branco. Para usar a API rodando no computador da clínica, digite local.</small>"
          "<button>Salvar e conectar</button></form>"
          "<form method=post action=/procurar><button class=leve>Procurar redes de novo</button></form>");
 
@@ -600,9 +601,14 @@ bool procurarApi() {
   return false;
 }
 
+// "local" no portal: usa a API rodando num computador da mesma rede, achada pela procura UDP.
+bool usaApiLocal() { return !strcasecmp(apiFixa, "local"); }
+
+// Sem nada no portal, a caixinha fala com o servidor do Pawtinhas na internet: funciona em qualquer
+// Wi-Fi com internet, sem computador ligado.
 String enderecoDaApi() {
+  if (usaApiLocal()) return apiEncontrada;
   if (apiFixa[0]) return apiFixa;
-  if (apiEncontrada[0]) return apiEncontrada;
   return API_ENDERECO_PADRAO;
 }
 
@@ -661,7 +667,7 @@ void buscarAlarmes() {
     if (ultimoCodigoHttp < 0) {
       situacaoApi = API_SEM_RESPOSTA;
       // O computador da API pode ter mudado de IP ou de rede: procura de novo.
-      if (!apiFixa[0] && millis() - ultimaProcura > 15000) {
+      if (usaApiLocal() && millis() - ultimaProcura > 15000) {
         if (procurarApi()) ultimaBusca = 0;
       }
     } else {

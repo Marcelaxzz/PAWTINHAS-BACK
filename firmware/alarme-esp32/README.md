@@ -1,12 +1,12 @@
 # Alarme de medicação (ESP32)
 
-Caixinha que toca os alarmes cadastrados no Pawtinhas, pelo site ou pelo app. Ela busca os alarmes ativos na API a cada 20 segundos, toca o buzzer no horário, mostra o nome do alarme e do pet no display e registra no histórico.
+Caixinha que toca os alarmes cadastrados no Pawtinhas, pelo site ou pelo app. Ela busca os alarmes ativos no servidor do Pawtinhas na internet (https://pawtinhas.vercel.app) a cada 20 segundos, toca o buzzer no horário, mostra o nome do alarme e do pet no display e registra no histórico.
 
 Funciona longe do computador:
 
 - **Sem cabo**: ligada num carregador de celular, num power bank ou numa fonte de 5 V. Depois da primeira gravação, dá até para atualizar o programa pelo Wi-Fi.
 - **Wi-Fi sem nada no código**: a rede é escolhida pelo celular. A placa guarda até 5 redes (casa, clínica, roteador do celular...) e conecta sozinha na que estiver por perto.
-- **Acha a API sozinha**: não precisa do IP do computador. Ela pergunta na rede e a API responde.
+- **Qualquer Wi-Fi com internet**: não precisa estar na mesma rede do computador, nem do computador ligado. Clínica, casa ou o roteador do celular servem.
 - **Sem internet continua tocando**: os alarmes ficam guardados na memória da placa, mesmo se ela for desligada da tomada. Os disparos feitos sem conexão vão para o histórico quando a conexão volta.
 
 ## Peças
@@ -56,7 +56,7 @@ Se a porta da placa não aparecer, instale o driver do chip USB: CP210x (Silicon
 1. Ligue a caixinha. Sem uma rede conhecida por perto, o display alterna entre **Configurar Wi-Fi / Pawtinhas-Alarme** e **Senha: pawtinhas / Abra 192.168.4.1**.
 2. No celular, entre no Wi-Fi **Pawtinhas-Alarme** com a senha **pawtinhas**. A página de configuração abre sozinha. Se não abrir, acesse `192.168.4.1` no navegador.
 3. Escolha a rede do lugar, digite a senha e toque em **Salvar e conectar**. O display mostra o nome da rede e o IP quando conectar.
-4. O campo **Endereço da API** fica em branco: a placa procura a API sozinha. Preencha só se a API estiver publicada na internet (ex.: `https://pawtinhas.com.br`) ou se a procura não funcionar (ex.: `192.168.0.10:5135`).
+4. Deixe o campo **Endereço da API** em branco: a placa usa o servidor na internet. Para testar com a API rodando no computador (mesma rede), digite `local`; para um endereço específico, digite-o (ex.: `http://192.168.0.10:5135`).
 
 O roteador do celular também serve. Só redes de **2,4 GHz** (o ESP32 não conecta em 5 GHz).
 
