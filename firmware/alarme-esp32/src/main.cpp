@@ -3,6 +3,7 @@
 // Funciona longe do computador, ligado num carregador de celular ou power bank:
 // - Wi-Fi sem nada no código: se não conhece a rede do lugar, a placa abre a rede "Pawtinhas-Alarme".
 //   Pelo celular, escolha o Wi-Fi e digite a senha. Ela guarda até 5 redes e conecta sozinha na que achar.
+//   Sem nenhuma delas por perto, entra numa rede aberta (sem senha) que tenha internet.
 // - Fala com o servidor do Pawtinhas na internet (pawtinhas.vercel.app), sem computador ligado. Para usar
 //   a API de um computador da rede, digite "local" no portal: a placa pergunta "PAWTINHAS?" por UDP.
 // - Guarda os alarmes na memória: sem internet ou com a API desligada, continua tocando os que já recebeu.
@@ -112,6 +113,7 @@ bool portalAberto = false;
 bool fecharPortalAgora = false;
 unsigned long ultimoUsoDoPortal = 0;
 unsigned long ultimaTentativaWifi = 0;
+bool naRedeAberta = false;           // conectada numa rede sem senha (não fica na lista)
 unsigned long conectadoDesde = 0;
 bool tentarWifiAgora = true;
 bool otaLigado = false;
@@ -300,10 +302,44 @@ void ligarServicosDeRede() {
   }
 }
 
+// Rede aberta só serve se tiver internet de verdade: rede com página de login responde outra coisa.
+bool temInternet() {
+  HTTPClient http;
+  http.setConnectTimeout(4000);
+  http.setTimeout(5000);
+  if (!http.begin(clienteHttp, "http://connectivitycheck.gstatic.com/generate_204")) return false;
+  int codigo = http.GET();
+  http.end();
+  return codigo == 204;
+}
+
+bool conectouEm(const char *nome, const char *senha) {
+  tela("Conectando Wi-Fi", nome);
+  Serial.printf("Conectando em %s...\n", nome);
+  WiFi.begin(nome, senha);
+  for (int i = 0; i < 30 && WiFi.status() != WL_CONNECTED; i++) {
+    delay(500);
+    if (portalAberto) {
+      dns.processNextRequest();
+      servidor.handleClient();
+    }
+  }
+  return WiFi.status() == WL_CONNECTED;
+}
+
+void marcarConectada(const char *nome, const char *detalhe) {
+  Serial.printf("Wi-Fi conectado em %s: %s\n", nome, WiFi.localIP().toString().c_str());
+  tela(nome, detalhe);
+  conectadoDesde = millis();
+  ligarServicosDeRede();
+  delay(1500);
+}
+
 // Procura as redes guardadas que estão no alcance e tenta da mais forte para a mais fraca.
+// Se nenhuma conectar, tenta as redes abertas (sem senha) que tiverem internet.
 bool conectarWifi() {
   ultimaTentativaWifi = millis();
-  if (totalRedes == 0) return false;
+  naRedeAberta = false;
 
   tela("Procurando Wi-Fi", "");
   int achadas = WiFi.scanNetworks();
@@ -319,6 +355,17 @@ bool conectarWifi() {
       ordem[candidatas] = i;
       sinal[candidatas++] = melhor;
     }
+  }
+  // Redes abertas no alcance, da mais forte para a mais fraca (a busca já vem nessa ordem).
+  const int MAX_ABERTAS = 3;
+  String abertas[MAX_ABERTAS];
+  int totalAbertas = 0;
+  for (int k = 0; k < achadas && totalAbertas < MAX_ABERTAS; k++) {
+    String nome = WiFi.SSID(k);
+    if (WiFi.encryptionType(k) != WIFI_AUTH_OPEN || nome.isEmpty() || nome == REDE_CONFIGURACAO) continue;
+    bool repetida = false;
+    for (int j = 0; j < totalAbertas; j++) repetida |= abertas[j] == nome;
+    if (!repetida) abertas[totalAbertas++] = nome;
   }
   WiFi.scanDelete();
   // Só uma rede guardada e ela não apareceu: tenta assim mesmo (pode ser uma rede oculta).
@@ -337,31 +384,42 @@ bool conectarWifi() {
   }
 
   for (int c = 0; c < candidatas; c++) {
-    const Rede &r = redes[ordem[c]];
-    tela("Conectando Wi-Fi", r.nome);
-    Serial.printf("Conectando em %s...\n", r.nome);
-    WiFi.begin(r.nome, r.senha);
-    for (int i = 0; i < 30 && WiFi.status() != WL_CONNECTED; i++) {
-      delay(500);
-      if (portalAberto) {
-        dns.processNextRequest();
-        servidor.handleClient();
-      }
-    }
-    if (WiFi.status() == WL_CONNECTED) {
-      Serial.printf("Wi-Fi conectado em %s: %s\n", r.nome, WiFi.localIP().toString().c_str());
-      tela(r.nome, WiFi.localIP().toString().c_str());
-      conectadoDesde = millis();
+    const Rede r = redes[ordem[c]];
+    if (conectouEm(r.nome, r.senha)) {
       // A rede que funcionou vai para o começo da lista.
       if (ordem[c] != 0) lembrarRede(r.nome, r.senha);
-      ligarServicosDeRede();
-      delay(1500);
+      marcarConectada(r.nome, WiFi.localIP().toString().c_str());
       return true;
     }
     WiFi.disconnect();
   }
-  Serial.println("Nenhuma rede guardada conectou.");
+
+  for (int c = 0; c < totalAbertas; c++) {
+    if (!conectouEm(abertas[c].c_str(), "")) {
+      WiFi.disconnect();
+      continue;
+    }
+    if (temInternet()) {
+      naRedeAberta = true;
+      marcarConectada(abertas[c].c_str(), "Rede aberta");
+      return true;
+    }
+    Serial.printf("%s não tem internet livre (pede login?).\n", abertas[c].c_str());
+    WiFi.disconnect();
+  }
+  Serial.println("Nenhuma rede conectou.");
   return false;
+}
+
+// Numa rede aberta, de tempos em tempos vê se uma rede guardada apareceu (é mais confiável).
+bool redeGuardadaPorPerto() {
+  int achadas = WiFi.scanNetworks();
+  bool achou = false;
+  for (int k = 0; k < achadas && !achou; k++) {
+    for (int i = 0; i < totalRedes && !achou; i++) achou = WiFi.SSID(k) == redes[i].nome;
+  }
+  WiFi.scanDelete();
+  return achou;
 }
 
 // ---------- Portal de configuração (pelo celular) ----------
@@ -546,7 +604,17 @@ void cuidarDoWifi() {
     return;
   }
 
-  if (conectado) return;
+  if (conectado) {
+    if (naRedeAberta && totalRedes > 0 && millis() - ultimaTentativaWifi > 300000UL) {
+      ultimaTentativaWifi = millis();
+      if (redeGuardadaPorPerto()) {
+        Serial.println("Rede guardada no alcance: saindo da rede aberta.");
+        WiFi.disconnect();
+        tentarWifiAgora = true;
+      }
+    }
+    return;
+  }
   if (tentarWifiAgora || millis() - ultimaTentativaWifi > 30000) {
     tentarWifiAgora = false;
     if (conectarWifi()) return;
