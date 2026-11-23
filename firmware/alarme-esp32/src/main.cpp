@@ -100,6 +100,7 @@ char apiEncontrada[101] = "";  // última API que respondeu à procura
 enum SituacaoApi { API_PROCURANDO, API_OK, API_SEM_RESPOSTA, API_CHAVE_ERRADA, API_DESLIGADA, API_ERRO };
 SituacaoApi situacaoApi = API_PROCURANDO;
 int ultimoCodigoHttp = 0;
+int falhasSeguidas = 0;  // buscas seguidas sem resposta do servidor
 bool alarmesDaMemoria = false;  // a lista veio da memória (ainda não falou com a API desde que ligou)
 
 Preferences memoria;
@@ -629,7 +630,10 @@ void cuidarDoWifi() {
 bool comecar(HTTPClient &http, const String &url) {
   http.setTimeout(8000);
   http.setConnectTimeout(5000);
+  // Conexão nova a cada pedido: uma conexão antiga que o roteador derrubou travava os pedidos seguintes.
+  http.setReuse(false);
   if (url.startsWith("https://")) {
+    clienteHttps.stop();
     clienteHttps.setInsecure();  // a placa não guarda certificados; a chave só vale para este dispositivo
     return http.begin(clienteHttps, url);
   }
@@ -741,6 +745,15 @@ void buscarAlarmes() {
     http.end();
     if (ultimoCodigoHttp < 0) {
       situacaoApi = API_SEM_RESPOSTA;
+      clienteHttps.stop();
+      clienteHttp.stop();
+      // Wi-Fi conectado mas o servidor não responde há ~1 minuto: reconecta (pode trocar de rede).
+      if (++falhasSeguidas >= 3) {
+        Serial.println("Sem resposta do servidor 3 vezes seguidas: reconectando o Wi-Fi.");
+        falhasSeguidas = 0;
+        WiFi.disconnect();
+        tentarWifiAgora = true;
+      }
       // O computador da API pode ter mudado de IP ou de rede: procura de novo.
       if (usaApiLocal() && millis() - ultimaProcura > 15000) {
         if (procurarApi()) ultimaBusca = 0;
@@ -751,6 +764,7 @@ void buscarAlarmes() {
     return;
   }
 
+  falhasSeguidas = 0;
   String corpo = http.getString();
   http.end();
   JsonDocument doc;
@@ -1049,7 +1063,7 @@ void telaParada() {
   else if (situacaoApi == API_PROCURANDO) aviso = "Procurando API";
   else if (situacaoApi == API_CHAVE_ERRADA) aviso = "Chave invalida";
   else if (situacaoApi == API_DESLIGADA) aviso = "ESP32 desligado";
-  else if (situacaoApi == API_SEM_RESPOSTA) aviso = "API fora do ar";
+  else if (situacaoApi == API_SEM_RESPOSTA) aviso = "Sem conexao";
   else if (situacaoApi == API_ERRO) {
     snprintf(linha, sizeof linha, "API erro %d", ultimoCodigoHttp);
     aviso = linha;
