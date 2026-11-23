@@ -114,6 +114,8 @@ bool portalAberto = false;
 bool fecharPortalAgora = false;
 unsigned long ultimoUsoDoPortal = 0;
 unsigned long ultimaTentativaWifi = 0;
+char redeSemInternet[33] = "";      // rede que ficou sem internet há pouco: vai para o fim da fila
+unsigned long redeSemInternetDesde = 0;
 bool naRedeAberta = false;           // conectada numa rede sem senha (não fica na lista)
 unsigned long conectadoDesde = 0;
 bool tentarWifiAgora = true;
@@ -353,6 +355,8 @@ bool conectarWifi() {
       if (WiFi.SSID(k) == redes[i].nome && WiFi.RSSI(k) > melhor) melhor = WiFi.RSSI(k);
     }
     if (melhor > -1000) {
+      // Ficou sem internet nos últimos 10 minutos: tenta as outras redes antes dela.
+      if (!strcmp(redes[i].nome, redeSemInternet) && millis() - redeSemInternetDesde < 600000UL) melhor -= 300;
       ordem[candidatas] = i;
       sinal[candidatas++] = melhor;
     }
@@ -386,7 +390,14 @@ bool conectarWifi() {
 
   for (int c = 0; c < candidatas; c++) {
     const Rede r = redes[ordem[c]];
-    if (conectouEm(r.nome, r.senha)) {
+    bool temOutraOpcao = c + 1 < candidatas || totalAbertas > 0;
+    if (conectouEm(r.nome, r.senha) && temOutraOpcao && !temInternet()) {
+      // Conectou mas a internet dessa rede caiu: passa para a próxima (se nenhuma servir, fica na última).
+      Serial.printf("%s conectou, mas está sem internet. Tentando outra rede.\n", r.nome);
+      WiFi.disconnect();
+      continue;
+    }
+    if (WiFi.status() == WL_CONNECTED) {
       // A rede que funcionou vai para o começo da lista.
       if (ordem[c] != 0) lembrarRede(r.nome, r.senha);
       marcarConectada(r.nome, WiFi.localIP().toString().c_str());
@@ -751,6 +762,8 @@ void buscarAlarmes() {
       if (++falhasSeguidas >= 3) {
         Serial.println("Sem resposta do servidor 3 vezes seguidas: reconectando o Wi-Fi.");
         falhasSeguidas = 0;
+        strlcpy(redeSemInternet, WiFi.SSID().c_str(), sizeof redeSemInternet);
+        redeSemInternetDesde = millis();
         WiFi.disconnect();
         tentarWifiAgora = true;
       }
